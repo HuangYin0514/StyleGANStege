@@ -155,7 +155,7 @@ def train(train_dataloader, model, device, save_dir_path, args):
 
             test(model, save_dir_path, args, num=step)
 
-    # stop time -----------------------------------
+    # stop time ---------------------------------------------------
     time_elapsed = time.time() - start_time
     logger.info('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
 

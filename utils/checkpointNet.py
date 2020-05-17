@@ -44,3 +44,31 @@ def load_network(network, path, epoch_label):
     network.load_state_dict(state_dict)
 
     return network
+
+
+# load part network from checkpoint -------------------------------------------------------------
+def load_part_network(network, path, epoch_label):
+
+    # devie---------------------------------------------------------------------------
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
+    #file name -----------------------------------------------------------------------------
+    file_path = os.path.join(path, 'net_%s.pth' % epoch_label)
+
+    # Original saved file with DataParallel-------------------------------------------------------
+    state_dict = torch.load(file_path, map_location=torch.device(device))
+
+    # If the model saved with DataParallel, the keys in state_dict contains 'module'-------------
+    if list(state_dict.keys())[0][:6] == 'module':
+        # Create new OrderedDict that does not contain `module.`
+        new_state_dict = OrderedDict()
+        for k, v in state_dict.items():
+            key_name = k[7:]  # remove `module.`
+            new_state_dict[key_name] = v
+        state_dict = new_state_dict
+
+    #load part network in state dict-----------------------------------------------------------
+    for module in state_dict:
+        network.state_dict()[module][:] = state_dict[module]
+
+    return network

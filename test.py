@@ -119,7 +119,7 @@ if __name__ == "__main__":
 
     # model------------------------------------------------------------------------------------
     model = build_model(args.experiment, image_size=args.image_size, lr=args.lr)
-    model = checkpointNet.load_network(model, args.checkpoint, args.which_epoch)
+    model = checkpointNet.load_part_network(model, args.checkpoint, args.which_epoch)
     model = model.to(device)
 
     test(model, save_dir_path, args)

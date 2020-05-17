@@ -1,0 +1,6 @@
+*.pt
+**.pyc
+**/experiments/
+**/data/
+**/__pycache__/
+**/.vscode/

@@ -1,7 +1,6 @@
 import os
 import sys
 import math
-import fire
 import json
 from math import floor, log2
 from random import random

@@ -57,8 +57,8 @@ parser.add_argument('--mixed_prob', default=0.9)
 """
 Train parameters
 """
-parser.add_argument('--num_train_steps', type=int, default=100000)
-parser.add_argument('--test_every', type=int, default=10)
+parser.add_argument('--num_train_steps', type=int, default=3)
+parser.add_argument('--test_every', type=int, default=1)
 
 """
 Optimizer parameters

@@ -4,15 +4,14 @@ import time
 from random import random
 
 import torch
+import torch.backends.cudnn as cudnn
 import torch.nn as nn
-
-from utils import util_logger
-from utils.util import *
 import torch.nn.functional as F
-from utils import SaveNetwork
+
+from utils import checkpointNet, util_logger
+from utils.util import *
 
 # speed up
-import torch.backends.cudnn as cudnn
 cudnn.benchmark = True
 
 
@@ -152,10 +151,12 @@ def train(train_dataloader, model, device, save_dir_path, args):
             torch.cuda.empty_cache()
             logger.info('g_loss: {:.4f}, d_loss {:.4f}'.format(g_loss, d_loss))
             logger.info('-' * 10)
+            
+            test(model, save_dir_path, args)
 
     # stop time -----------------------------------
     time_elapsed = time.time() - start_time
     logger.info('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
 
     # Save final model weights-----------------------------------
-    SaveNetwork.save_network(model, save_dir_path, 'final')
+    checkpointNet.save_network(model, save_dir_path, 'final')

@@ -147,12 +147,13 @@ def train(train_dataloader, model, device, save_dir_path, args):
         if step <= 25000 and step % 1000 == 2:
             model.reset_parameter_averaging()
 
+        logger.info('g_loss: {:.4f}, d_loss {:.4f}'.format(g_loss, d_loss))
+        logger.info('-' * 10)
+
         # Testing / Validating-----------------------------------
         if (step + 1) % args.test_every == 0 or step + 1 == args.num_train_steps:
             torch.cuda.empty_cache()
-            logger.info('g_loss: {:.4f}, d_loss {:.4f}'.format(g_loss, d_loss))
-            logger.info('-' * 10)
-
+            logger.info('-------------------test--------------------')
             test(model, save_dir_path, args, num=step)
 
     # stop time ---------------------------------------------------

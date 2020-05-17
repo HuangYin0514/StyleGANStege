@@ -8,7 +8,8 @@ from torch.optim import lr_scheduler
 
 from dataloader import getDataLoader
 from models import build_model
-from train import *
+from trainE import *
+from utils import checkpointNet
 
 
 parser = argparse.ArgumentParser(description='stegan stylegan')
@@ -30,10 +31,13 @@ parser.add_argument('--batch_size', default=3, type=int, help='batch_size')
 """
 Model parameters
 """
-parser.add_argument('--experiment', type=str, default='StyleGAN2')
+parser.add_argument('--experiment', type=str, default='ExtractNet')
 parser.add_argument('--image_size', default=64)
 parser.add_argument('--gradient_accumulate_every', default=5)
 parser.add_argument('--mixed_prob', default=0.9)
+
+parser.add_argument('--which_epoch', default='final', type=str, help='0,1,2,3...or final')
+parser.add_argument('--checkpoint', type=str, default='/home/hy/vscode/StyleGANStege/experiments/Celeba')
 
 """
 Train parameters
@@ -64,9 +68,13 @@ if __name__ == "__main__":
     model = build_model(args.experiment, image_size=args.image_size, lr=args.lr)
     model = model.to(device)
 
+    stylegan = build_model('StyleGAN2', image_size=args.image_size, lr=args.lr)
+    stylegan = checkpointNet.load_part_network(stylegan, args.checkpoint, args.which_epoch)
+    stylegan = stylegan.to(device)
+
     # save_dir_path-----------------------------------------------------------------------------------
     save_dir_path = os.path.join(args.save_path, args.dataset)
     os.makedirs(save_dir_path, exist_ok=True)
 
     # train -----------------------------------------------------------------------------------
-    train(train_dataloader, model, device, save_dir_path, args)
+    train(train_dataloader, model, stylegan, device, save_dir_path, args)

@@ -24,7 +24,7 @@ def tile(a, dim, n_tile):
 
 # generate_images --------------------------------------------
 @torch.no_grad()
-def generate_images(stylizer, generator, latents, noise):
+def generate_images(stylizer, generator, latents, noise, args):
     w = latent_to_w(stylizer, latents)
     w_styles = styles_def_to_tensor(w)
     generated_images = evaluate_in_chunks(args.batch_size, generator,
@@ -76,7 +76,7 @@ def test(model, save_dir_path, args, num=0, num_image_tiles=8):
     n = latent_to_nosie(model.N, noise_)
 
     # regular-------------------------------------------
-    generated_images = generate_images(model.S, model.G, latents, n)
+    generated_images = generate_images(model.S, model.G, latents, n, args)
     torchvision.utils.save_image(generated_images, str(Path(save_dir_path) / f'{str(num)}.{ext}'), nrow=num_rows)
 
     # moving averages-------------------------------------------

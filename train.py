@@ -10,6 +10,7 @@ import torch.nn.functional as F
 
 from utils import checkpointNet, util_logger
 from utils.util import *
+from test import test
 
 # speed up
 cudnn.benchmark = True
@@ -151,8 +152,8 @@ def train(train_dataloader, model, device, save_dir_path, args):
             torch.cuda.empty_cache()
             logger.info('g_loss: {:.4f}, d_loss {:.4f}'.format(g_loss, d_loss))
             logger.info('-' * 10)
-            
-            test(model, save_dir_path, args)
+
+            test(model, save_dir_path, args, num=step)
 
     # stop time -----------------------------------
     time_elapsed = time.time() - start_time

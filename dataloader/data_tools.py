@@ -33,6 +33,8 @@ def read_image(path):
             pass
     return img
 
-if __name__ == "__main__":
-    i = read_image('data/Occluded_REID/occluded_body_images/002/002_01.tif1')
-    print(i.size)
+
+def cycle(iterable):
+    while True:
+        for i in iterable:
+            yield i

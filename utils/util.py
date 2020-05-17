@@ -26,10 +26,7 @@ def default(value, d):
     return d if value is None else value
 
 
-def cycle(iterable):
-    while True:
-        for i in iterable:
-            yield i
+
 
 
 def raise_if_nan(t):

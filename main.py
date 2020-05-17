@@ -44,13 +44,21 @@ Data parameters
 """
 parser.add_argument('--dataset', type=str, default='Celeba')
 parser.add_argument('--dataset_path', type=str, default='/home/hy/vscode/reid-custom/data/Market-1501-v15.09.15')
-parser.add_argument('--batch_size', default=64, type=int, help='batch_size')
+parser.add_argument('--batch_size', default=3, type=int, help='batch_size')
 
 """
 Model parameters
 """
 parser.add_argument('--experiment', type=str, default='StyleGAN2')
 parser.add_argument('--image_size', default=64)
+parser.add_argument('--gradient_accumulate_every', default=5)
+parser.add_argument('--mixed_prob', default=0.9)
+
+"""
+Train parameters
+"""
+parser.add_argument('--num_train_steps', type=int, default=100000)
+parser.add_argument('--test_every', type=int, default=10)
 
 """
 Optimizer parameters
@@ -80,4 +88,4 @@ if __name__ == "__main__":
     os.makedirs(save_dir_path, exist_ok=True)
 
     # train -----------------------------------------------------------------------------------
-    train(train_dataloader, model, save_dir_path, args)
+    train(train_dataloader, model, device, save_dir_path, args)

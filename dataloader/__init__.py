@@ -5,6 +5,8 @@ import torch
 from torchvision import datasets, transforms
 
 from .Celeba import Dataset
+from .data_tools import cycle
+
 
 __dataset_factory = {
     'Celeba': Dataset,
@@ -57,7 +59,7 @@ def getDataLoader(dataset, batch_size, dataset_path, shuffle=True, augment=True,
     image_dataset = __dataset_factory[dataset](dataset_path, transform=transform)
     dataloader = torch.utils.data.DataLoader(image_dataset, batch_size=batch_size, shuffle=shuffle, num_workers=4,
                                              drop_last=True, pin_memory=True)
-
+    dataloader = cycle(dataloader)
     return dataloader
 
 

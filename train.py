@@ -9,15 +9,14 @@ import torch.nn as nn
 from utils import util_logger
 from utils.util import *
 import torch.nn.functional as F
-
+from utils import SaveNetwork
 
 # speed up
 import torch.backends.cudnn as cudnn
 cudnn.benchmark = True
 
+
 # ---------------------- Train function ----------------------
-
-
 def train(train_dataloader, model, device, save_dir_path, args):
     '''
         train
@@ -37,6 +36,7 @@ def train(train_dataloader, model, device, save_dir_path, args):
     d_loss = 0
     g_loss = 0
     EPS = 1e-8
+    pl_length_ma = EMA(0.99)
 
     # +++++++++++++++++++++++++++++++++start++++++++++++++++++++++++++++++++++++++++
     for step in range(args.num_train_steps):
@@ -95,58 +95,67 @@ def train(train_dataloader, model, device, save_dir_path, args):
 
             # record total loss--------------------------------
             total_disc_loss += divergence.detach().item() / args.gradient_accumulate_every
-        # d_loss = float(total_disc_loss)
-        # model.D_opt.step()
+        d_loss = float(total_disc_loss)
+        model.D_opt.step()
 
-        # # train generator************************************
-        # model.G_opt.zero_grad()
-        # for i in range(args.gradient_accumulate_every):
-        #     # w--------------------------------
-        #     style = get_latents_fn(batch_size, num_layers, latent_dim)
-        #     w_space = latent_to_w(model.S, style)
-        #     w_styles = styles_def_to_tensor(w_space)
+        # train generator************************************
+        model.G_opt.zero_grad()
+        for i in range(args.gradient_accumulate_every):
+            # w--------------------------------
+            style = get_latents_fn(batch_size, num_layers, latent_dim)
+            w_space = latent_to_w(model.S, style)
+            w_styles = styles_def_to_tensor(w_space)
 
-        #     # noise--------------------------------
-        #     noise = custom_image_nosie(batch_size, 100)
-        #     noise_styles = latent_to_nosie(model.N, noise)
+            # noise--------------------------------
+            noise = custom_image_nosie(batch_size, 100)
+            noise_styles = latent_to_nosie(model.N, noise)
 
-        #     # fake--------------------------------
-        #     generated_images = model.G(w_styles, noise_styles)
-        #     fake_output = model.D(generated_images)
-        #     loss = fake_output.mean()
-        #     gen_loss = loss
+            # fake--------------------------------
+            generated_images = model.G(w_styles, noise_styles)
+            fake_output = model.D(generated_images)
+            loss = fake_output.mean()
+            gen_loss = loss
 
-        #     # pl loss--------------------------------
-        #     if apply_path_penalty:
-        #         std = 0.1 / (w_styles.std(dim=0, keepdim=True) + EPS)
-        #         w_styles_2 = w_styles + torch.randn(w_styles.shape).to(device) / (std + EPS)
-        #         pl_images = model.G(w_styles_2, noise_styles)
-        #         pl_lengths = ((pl_images - generated_images)**2).mean(dim=(1, 2, 3))
-        #         avg_pl_length = np.mean(pl_lengths.detach().cpu().numpy())
+            # pl loss--------------------------------
+            if apply_path_penalty:
+                std = 0.1 / (w_styles.std(dim=0, keepdim=True) + EPS)
+                w_styles_2 = w_styles + torch.randn(w_styles.shape).to(device) / (std + EPS)
+                pl_images = model.G(w_styles_2, noise_styles)
+                pl_lengths = ((pl_images - generated_images)**2).mean(dim=(1, 2, 3))
+                avg_pl_length = np.mean(pl_lengths.detach().cpu().numpy())
 
-        #         if pl_mean is not None:
-        #             pl_loss = ((pl_lengths - pl_mean)**2).mean()
-        #             if not torch.isnan(pl_loss):
-        #                 gen_loss = gen_loss + pl_loss
+                if pl_mean is not None:
+                    pl_loss = ((pl_lengths - pl_mean)**2).mean()
+                    if not torch.isnan(pl_loss):
+                        gen_loss = gen_loss + pl_loss
 
-        #     gen_loss = gen_loss / args.gradient_accumulate_every
-        #     gen_loss.register_hook(raise_if_nan)
-        #     gen_loss.backward()
+            gen_loss = gen_loss / args.gradient_accumulate_every
+            gen_loss.register_hook(raise_if_nan)
+            gen_loss.backward()
 
-        #     # total loss--------------------------------
-        #     total_gen_loss += loss.detach().item() / args.gradient_accumulate_every
-        # g_loss = float(total_gen_loss)
-        # model.G_opt.step()
+            # total loss--------------------------------
+            total_gen_loss += loss.detach().item() / args.gradient_accumulate_every
 
+        g_loss = float(total_gen_loss)
+        model.G_opt.step()
 
-        # #calculate moving averages ---------------------------------------
-        # if apply_path_penalty and not np.isnan(avg_pl_length):
-        #     pl_mean = self.pl_length_ma.update_average(pl_mean, avg_pl_length)
-        # if self.steps % 10 == 0 and self.steps > 20000:
-        #     self.GAN.EMA()
-        # if self.steps <=  and self.steps % 1000 == 2:
-        #     self.GAN.reset_parameter_averaging()
+        # calculate moving averages ---------------------------------------
+        if apply_path_penalty and not np.isnan(avg_pl_length):
+            pl_mean = pl_length_ma.update_average(pl_mean, avg_pl_length)
+        if step % 10 == 0 and step > 20000:
+            model.EMA()
+        if step <= 25000 and step % 1000 == 2:
+            model.reset_parameter_averaging()
 
-        print(g_loss , d_loss)
+        # Testing / Validating-----------------------------------
+        if (step + 1) % args.test_every == 0 or step + 1 == args.num_train_steps:
+            torch.cuda.empty_cache()
+            logger.info('g_loss: {:.4f}, d_loss {:.4f}'.format(g_loss, d_loss))
+            logger.info('-' * 10)
 
-        break
+    # stop time -----------------------------------
+    time_elapsed = time.time() - start_time
+    logger.info('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
+
+    # Save final model weights-----------------------------------
+    SaveNetwork.save_network(model, save_dir_path, 'final')

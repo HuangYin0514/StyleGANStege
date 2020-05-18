@@ -1,8 +1,8 @@
 
-from models import build_model
 import sys
 sys.path.append('/home/hy/vscode/StyleGANStege')
 print(sys.path)
+from models import build_model
 
 if __name__ == "__main__":
 

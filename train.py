@@ -152,7 +152,7 @@ def train(train_dataloader, model, device, save_dir_path, args):
         logger.info('g_loss: {:.4f}, d_loss {:.4f}'.format(g_loss, d_loss))
         logger.info('-' * 10)
 
-         if any(torch.isnan(l) for l in (total_gen_loss, total_disc_loss)):
+        if any(torch.isnan(l) for l in (total_gen_loss, total_disc_loss)):
             print(
                 f'NaN detected for generator or discriminator. Loading from checkpoint!'
             )

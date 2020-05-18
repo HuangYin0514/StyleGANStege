@@ -48,7 +48,7 @@ parser.add_argument('--test_every', type=int, default=10000)
 """
 Optimizer parameters
 """
-parser.add_argument('--lr', type=float, default=0.1)
+parser.add_argument('--lr', type=float, default=2e-4)
 
 args = parser.parse_args()
 
@@ -60,9 +60,6 @@ if __name__ == "__main__":
     # Fix random seed---------------------------------------------------------------------------
     torch.manual_seed(1)
     torch.cuda.manual_seed_all(1)
-
-    # dataset------------------------------------------------------------------------------------
-    train_dataloader = getDataLoader(args.dataset, args.batch_size, args.dataset_path)
 
     # model------------------------------------------------------------------------------------
     model = build_model(args.experiment, image_size=args.image_size, lr=args.lr)
@@ -80,4 +77,4 @@ if __name__ == "__main__":
     os.makedirs(save_dir_path, exist_ok=True)
 
     # train -----------------------------------------------------------------------------------
-    train(train_dataloader, model, stylegan, criterion, device, save_dir_path, args)
+    train(None, model, stylegan, criterion, device, save_dir_path, args)

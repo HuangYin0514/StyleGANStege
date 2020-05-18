@@ -11,6 +11,7 @@ device = torch.device("cuda:0" if (torch.cuda.is_available()) else "cpu")
 class NanException(Exception):
     pass
 
+
 class EMA():
     def __init__(self, beta):
         super().__init__()
@@ -22,10 +23,10 @@ class EMA():
         return old * self.beta + (1 - self.beta) * new
 
 # helpers
+
+
 def default(value, d):
     return d if value is None else value
-
-
 
 
 
@@ -70,6 +71,7 @@ def custom_image_nosie(n, latent_dim):
 
 
 def latent_to_nosie(noise_vectorizer, latent_descr):
+    return image_noise(batch_size=64, image_size=64)
     return noise_vectorizer(latent_descr)
 
 

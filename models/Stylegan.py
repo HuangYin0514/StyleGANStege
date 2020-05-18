@@ -9,7 +9,6 @@ from .Discriminator import *
 
 
 
-
 class StyleGAN2(nn.Module):
 
     def __init__(self, image_size, latent_dim=512, noise_dim=100, style_depth=8, network_capacity=16, transparent=False, steps=1, lr=2e-4):
@@ -31,7 +30,7 @@ class StyleGAN2(nn.Module):
         set_requires_grad(self.NE, False)
         set_requires_grad(self.GE, False)
 
-        generator_params = list(self.G.parameters()) + list(self.S.parameters()) + list(self.N.parameters())
+        generator_params = list(self.G.parameters()) + list(self.S.parameters())
         self.G_opt = DiffGrad(generator_params, lr=self.lr, betas=(0.5, 0.9))
         self.D_opt = DiffGrad(self.D.parameters(), lr=self.lr, betas=(0.5, 0.9))
 

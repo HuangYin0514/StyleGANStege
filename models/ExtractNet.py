@@ -91,7 +91,7 @@ class ExtractNet(nn.Module):
         self.E = ExtractModule()
         self.N = NoiseVectorizer(100)
 
-        generator_params = list(self.E.parameters()) + list(self.N.parameters())
+        generator_params = list(self.E.parameters()) 
         self.E_opt = torch.optim.Adam(generator_params, lr=self.lr, betas=(self.beta1, self.beta2))
 
         self._init_weights()

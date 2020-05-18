@@ -46,7 +46,7 @@ def train(train_dataloader, model, stylegan, criterion, device, save_dir_path, a
     logger = util_logger.Logger(save_dir_path)
     logger.info('-' * 10)
     logger.info(vars(args))
-    logger.info(model)
+    # logger.info(model)
 
     # train----------------------------------------------
     for step in range(args.num_train_steps):

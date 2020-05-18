@@ -53,8 +53,6 @@ def train(train_dataloader, model, stylegan, criterion, device, save_dir_path, a
         # info ----------------------------------------------------
         model.train()
 
-        logger.info('step {}/{}'.format(step + 1, args.num_train_steps))
-
         # clear grad-----------------
         model.E.zero_grad()
         # prepare data -------------
@@ -74,9 +72,12 @@ def train(train_dataloader, model, stylegan, criterion, device, save_dir_path, a
         BER_2 = compute_BER(decode_msg.detach(), secret, sigma=2)
         BER_3 = compute_BER(decode_msg.detach(), secret, sigma=3)
         E_loss = float(divergence.detach().item())
-        logger.info('E_loss:{}'.format(E_loss))
-        logger.info('BER_1:{} BER_2:{} BER_3:{}'.format(BER_1, BER_2, BER_3))
-        logger.info('-' * 10)
+
+        if step % 20 == 0:
+            logger.info('step {}/{}'.format(step + 1, args.num_train_steps))
+            logger.info('E_loss:{}'.format(E_loss))
+            logger.info('BER_1:{} BER_2:{} BER_3:{}'.format(BER_1, BER_2, BER_3))
+            logger.info('-' * 10)
 
     # stop time ---------------------------------------------------
     time_elapsed = time.time() - start_time

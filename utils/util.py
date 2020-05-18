@@ -71,7 +71,7 @@ def custom_image_nosie(n, latent_dim):
 
 
 def latent_to_nosie(noise_vectorizer, latent_descr):
-    return image_noise(n=64, im_size=64)
+    # return image_noise(n=64, im_size=64)
     return noise_vectorizer(latent_descr)
 
 

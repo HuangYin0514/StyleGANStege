@@ -2,6 +2,7 @@ import torch
 
 from utils.util import *
 from torch import nn
+from .NoiseVectorizer import *
 
 
 def weights_init(m):
@@ -88,10 +89,10 @@ class ExtractNet(nn.Module):
         self.beta2 = beta2
 
         self.E = ExtractModule()
+        self.N = NoiseVectorizer(100)
 
-        self.E_opt = torch.optim.Adam(self.E.parameters(),
-                                      lr=self.lr,
-                                      betas=(self.beta1, self.beta2))
+        generator_params = list(self.E.parameters()) + list(self.N.parameters())
+        self.E_opt = torch.optim.Adam(generator_params, lr=self.lr, betas=(self.beta1, self.beta2))
 
         self._init_weights()
 

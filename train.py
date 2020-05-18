@@ -28,7 +28,7 @@ def train(train_dataloader, model, device, save_dir_path, args):
     logger = util_logger.Logger(save_dir_path)
     logger.info('-' * 10)
     logger.info(vars(args))
-    logger.info(model)
+    # logger.info(model)
 
     # init gloabel parameters ----------------------------------------
     pl_mean = 0

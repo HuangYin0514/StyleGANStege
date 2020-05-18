@@ -28,7 +28,7 @@ def train(train_dataloader, model, device, save_dir_path, args):
     logger = util_logger.Logger(save_dir_path)
     logger.info('-' * 10)
     logger.info(vars(args))
-    # logger.info(model)
+    logger.info(model)
 
     # init gloabel parameters ----------------------------------------
     pl_mean = 0
@@ -68,9 +68,8 @@ def train(train_dataloader, model, device, save_dir_path, args):
             w_styles = styles_def_to_tensor(w_space)
 
             # noise--------------------------------
-            # noise = custom_image_nosie(batch_size, 100)
-            # noise_styles = latent_to_nosie(model.N, noise)
-            noise_styles = image_noise(batch_size, image_size)
+            noise = custom_image_nosie(batch_size, 100)
+            noise_styles = latent_to_nosie(model.N, noise)
 
             # trian fake--------------------------------
             generated_images = model.G(w_styles, noise_styles)
@@ -108,9 +107,8 @@ def train(train_dataloader, model, device, save_dir_path, args):
             w_styles = styles_def_to_tensor(w_space)
 
             # noise--------------------------------
-            # noise = custom_image_nosie(batch_size, 100)
-            # noise_styles = latent_to_nosie(model.N, noise)
-            noise_styles = image_noise(batch_size, image_size)
+            noise = custom_image_nosie(batch_size, 100)
+            noise_styles = latent_to_nosie(model.N, noise)
 
             # fake--------------------------------
             generated_images = model.G(w_styles, noise_styles)
@@ -151,12 +149,6 @@ def train(train_dataloader, model, device, save_dir_path, args):
 
         logger.info('g_loss: {:.4f}, d_loss {:.4f}'.format(g_loss, d_loss))
         logger.info('-' * 10)
-
-        if any(torch.isnan(l) for l in (total_gen_loss, total_disc_loss)):
-            print(
-                f'NaN detected for generator or discriminator. Loading from checkpoint!'
-            )
-            raise NanException
 
         # Testing / Validating-----------------------------------
         if (step + 1) % args.test_every == 0 or step + 1 == args.num_train_steps:

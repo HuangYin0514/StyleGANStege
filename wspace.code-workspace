@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "../reid-custom"
+		},
+		{
+			"path": "."
+		}
+	],
+	"remoteAuthority": "wsl+Ubuntu",
+	"settings": {}
+}

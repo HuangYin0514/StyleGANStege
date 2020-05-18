@@ -72,9 +72,8 @@ def test(model, save_dir_path, args, num=0, num_image_tiles=8):
     latents = noise_list(num_rows**2, num_layers, latent_dim)
 
     # noise-------------------------------------------
-    # noise_ = custom_image_nosie(num_rows**2, 100)
-    # n = latent_to_nosie(model.N, noise_)
-    n = image_noise(args.batch_size, image_size)
+    noise_ = custom_image_nosie(num_rows**2, 100)
+    n = latent_to_nosie(model.N, noise_)
 
     # regular-------------------------------------------
     generated_images = generate_images(model.S, model.G, latents, n, args)

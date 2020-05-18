@@ -11,6 +11,24 @@ from models import build_model
 from train import *
 
 # -----------------------------parameters setting --------------------------------
+data = '../../gan/custom_dataset',
+results_dir = './GoodResult/results',
+models_dir = './GoodResult/models',
+log_dir = './GoodResult/logs',
+name = 'mytest',
+new = False,
+load_from = 10,
+network_capacity = 16,
+transparent = False,
+batch_size = 3,
+gradient_accumulate_every = 5,
+num_train_steps = 120000,
+learning_rate = 2e-4,
+num_workers = None,
+save_every = 10000,
+generate = False,
+num_image_tiles = 8,
+trunc_psi = 0.6
 
 parser = argparse.ArgumentParser(description='stegan stylegan')
 
@@ -26,7 +44,7 @@ Data parameters
 """
 parser.add_argument('--dataset', type=str, default='Celeba')
 parser.add_argument('--dataset_path', type=str, default='/home/hy/vscode/reid-custom/data/Market-1501-v15.09.15')
-parser.add_argument('--batch_size', default=64, type=int, help='batch_size')
+parser.add_argument('--batch_size', default=3, type=int, help='batch_size')
 
 """
 Model parameters
@@ -45,7 +63,7 @@ parser.add_argument('--test_every', type=int, default=10000)
 """
 Optimizer parameters
 """
-parser.add_argument('--lr', type=float, default=0.1)
+parser.add_argument('--lr', type=float, default=2e-4)
 
 args = parser.parse_args()
 

@@ -107,8 +107,9 @@ def train(train_dataloader, model, device, save_dir_path, args):
             w_styles = styles_def_to_tensor(w_space)
 
             # noise--------------------------------
-            noise = custom_image_nosie(batch_size, 100)
-            noise_styles = latent_to_nosie(model.N, noise)
+            # noise = custom_image_nosie(batch_size, 100)
+            # noise_styles = latent_to_nosie(model.N, noise)
+            noise_styles = image_noise(batch_size, image_size)
 
             # fake--------------------------------
             generated_images = model.G(w_styles, noise_styles)

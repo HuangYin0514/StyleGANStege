@@ -57,7 +57,7 @@ def train(train_dataloader, model, stylegan, criterion, device, save_dir_path, a
         model.E.zero_grad()
         # prepare data -------------
         w_styles, noise_styles, secret = sample_StyleGAN_input_data(stylegan, args)
-        generated_images = stylegan.G(w_styles, noise_styles)
+        generated_images = stylegan.G(w_styles.to(device), noise_styles)
         decode_msg = model.E(generated_images.clone().detach())
         # loss----------------------
         divergence = args.batch_size * criterion(decode_msg, secret)

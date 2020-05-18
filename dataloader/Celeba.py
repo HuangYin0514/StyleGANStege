@@ -7,16 +7,55 @@ from PIL import Image
 from pathlib import Path
 
 
+# dataset
+def convert_rgb_to_transparent(image):
+    if image.mode == 'RGB':
+        return image.convert('RGBA')
+    return image
+
+
+def convert_transparent_to_rgb(image):
+    if image.mode == 'RGBA':
+        return image.convert('RGB')
+    return image
+
+
+class expand_greyscale(object):
+    def __init__(self, num_channels):
+        self.num_channels = num_channels
+
+    def __call__(self, tensor):
+        return tensor.expand(self.num_channels, -1, -1)
+
+
+def resize_to_minimum_size(min_size, image):
+    if max(*image.size) < min_size:
+        return torchvision.transforms.functional.resize(image, min_size)
+    return image
+
+
 EXTS = ['jpg', 'png']
 
 
-# dataset
 class Dataset(data.Dataset):
-    def __init__(self, folder, transform=None):
+    def __init__(self, folder, image_size, transparent=False, **args):
         super().__init__()
         self.folder = folder
+        self.image_size = image_size
         self.paths = [p for ext in EXTS for p in Path(f'{folder}').glob(f'**/*.{ext}')]
-        self.transform = transform
+
+        convert_image_fn = convert_transparent_to_rgb if not transparent else convert_rgb_to_transparent
+        num_channels = 3 if not transparent else 4
+
+        self.transform = transforms.Compose([
+            transforms.Lambda(convert_image_fn),
+            transforms.Lambda(partial(resize_to_minimum_size, image_size)),
+            transforms.RandomHorizontalFlip(),
+            transforms.Resize(image_size),
+            transforms.CenterCrop(image_size),
+            transforms.ToTensor(),
+            transforms.Lambda(expand_greyscale(num_channels))
+        ])
 
     def __len__(self):
         return len(self.paths)
@@ -24,6 +63,4 @@ class Dataset(data.Dataset):
     def __getitem__(self, index):
         path = self.paths[index]
         img = Image.open(path)
-        if self.transform is not None:
-            img = self.transform(img)
-        return img
+        return self.transform(img)

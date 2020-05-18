@@ -72,9 +72,12 @@ if __name__ == "__main__":
     stylegan = checkpointNet.load_part_network(stylegan, args.checkpoint, args.which_epoch)
     stylegan = stylegan.to(device)
 
+    # criterion-----------------------------------------------------------------------------------
+    criterion = nn.MSELoss()
+
     # save_dir_path-----------------------------------------------------------------------------------
-    save_dir_path = os.path.join(args.save_path, args.dataset)
+    save_dir_path = os.path.join(args.save_path, args.experiment)
     os.makedirs(save_dir_path, exist_ok=True)
 
     # train -----------------------------------------------------------------------------------
-    train(train_dataloader, model, stylegan, device, save_dir_path, args)
+    train(train_dataloader, model, stylegan, criterion, device, save_dir_path, args)

@@ -44,7 +44,7 @@ Data parameters
 """
 parser.add_argument('--dataset', type=str, default='Celeba')
 parser.add_argument('--dataset_path', type=str, default='/home/hy/vscode/reid-custom/data/Market-1501-v15.09.15')
-parser.add_argument('--batch_size', default=3, type=int, help='batch_size')
+parser.add_argument('--batch_size', default=64, type=int, help='batch_size')
 
 """
 Model parameters

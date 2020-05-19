@@ -58,8 +58,8 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Fix random seed---------------------------------------------------------------------------
-    torch.manual_seed(1)
-    torch.cuda.manual_seed_all(1)
+    # torch.manual_seed(1)
+    # torch.cuda.manual_seed_all(1)
 
     # model------------------------------------------------------------------------------------
     model = build_model(args.experiment, image_size=args.image_size, lr=args.lr)

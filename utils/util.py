@@ -29,7 +29,6 @@ def default(value, d):
     return d if value is None else value
 
 
-
 def raise_if_nan(t):
     if torch.isnan(t):
         raise NanException
@@ -71,8 +70,8 @@ def custom_image_nosie(n, latent_dim):
 
 
 def latent_to_nosie(noise_vectorizer, latent_descr):
-    # return image_noise(n=64, im_size=64)
-    return noise_vectorizer(latent_descr)
+    return image_noise(n=64, im_size=64)
+    # return noise_vectorizer(latent_descr)
 
 
 def leaky_relu(p):

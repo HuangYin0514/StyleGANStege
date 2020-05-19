@@ -13,7 +13,7 @@ def weights_init(m):
         m.weight.data.normal_(1.0, 0.02)
         m.bias.data.fill_(0)
 
-
+        
 # ExtractModule--------------------------------------------------------------------------------
 class ExtractModule(nn.Module):
     def __init__(self):
@@ -73,7 +73,7 @@ class ExtractModule(nn.Module):
         out = self.relu(out)
         out = out.view(in_size, -1)
         out = self.linear1(out)
-        out = self.tanh(out)
+        # out = self.tanh(out)
         return out
 
 
@@ -91,7 +91,7 @@ class ExtractNet(nn.Module):
         self.E = ExtractModule()
         self.N = NoiseVectorizer(100)
 
-        generator_params = list(self.E.parameters()) 
+        generator_params = list(self.E.parameters())
         self.E_opt = torch.optim.Adam(generator_params, lr=self.lr, betas=(self.beta1, self.beta2))
 
         self._init_weights()

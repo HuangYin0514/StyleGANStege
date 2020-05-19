@@ -2,6 +2,8 @@ from torch import nn
 from utils.util import leaky_relu
 import torch
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 class NoiseVectorizer(nn.Module):
     def __init__(self, emb):
@@ -22,7 +24,7 @@ class NoiseVectorizer(nn.Module):
         )
 
     def forward(self, x):
+
         return torch.FloatTensor(x.size(0), 64, 64, 1).uniform_(0., 1.).to(device)
         # return self.net(x).reshape(-1, 64, 64, 1)
-
 

@@ -82,7 +82,7 @@ def load_part_network(network, path, epoch_label):
         warnings.warn(
             'The pretrained weights "{}" cannot be loaded, '
             'please check the key names manually '
-            '(** ignored and continue **)'.format(weight_path)
+            '(** ignored and continue **)'.format(path)
         )
     else:
         print(

@@ -53,11 +53,14 @@ parser.add_argument('--experiment', type=str, default='StyleGAN2')
 parser.add_argument('--image_size', default=64)
 parser.add_argument('--gradient_accumulate_every', default=5)
 parser.add_argument('--mixed_prob', default=0.9)
+parser.add_argument('--which_epoch', default='final', type=str, help='0,1,2,3...or final')
+parser.add_argument('--checkpoint', type=str, default='/home/hy/vscode/StyleGANStege/experiments/Celeba')
 
 """
 Train parameters
 """
-parser.add_argument('--num_train_steps', type=int, default=25000)
+parser.add_argument('--start_steps', type=int, default=25000)
+parser.add_argument('--num_train_steps', type=int, default=25002)
 parser.add_argument('--test_every', type=int, default=10000)
 
 """
@@ -81,6 +84,7 @@ if __name__ == "__main__":
 
     # model------------------------------------------------------------------------------------
     model = build_model(args.experiment, image_size=args.image_size, lr=args.lr)
+    model = checkpointNet.load_part_network(model, args.checkpoint, args.which_epoch)
     model = model.to(device)
 
     # save_dir_path-----------------------------------------------------------------------------------

@@ -39,7 +39,7 @@ def train(train_dataloader, model, device, save_dir_path, args):
     pl_length_ma = EMA(0.99)
 
     # +++++++++++++++++++++++++++++++++start++++++++++++++++++++++++++++++++++++++++
-    for step in range(args.num_train_steps):
+    for step in range(args.start_steps, args.num_train_steps):
 
         model.train()
 
@@ -147,14 +147,19 @@ def train(train_dataloader, model, device, save_dir_path, args):
         if step <= 25000 and step % 1000 == 2:
             model.reset_parameter_averaging()
 
-        logger.info('g_loss: {:.4f}, d_loss {:.4f}'.format(g_loss, d_loss))
-        logger.info('-' * 10)
+        if step % 10 == 0:
+            logger.info('g_loss: {:.4f}, d_loss {:.4f}'.format(g_loss, d_loss))
+            logger.info('-' * 10)
 
         # Testing / Validating-----------------------------------
         if (step + 1) % args.test_every == 0 or step + 1 == args.num_train_steps:
             torch.cuda.empty_cache()
             logger.info('-------------------test--------------------')
             test(model, save_dir_path, args, num=step)
+
+        # for kaggle time to stop (14400 sce about 4 hours)-----------
+        if time.time() - start_time > 14400:
+            break
 
     # stop time ---------------------------------------------------
     time_elapsed = time.time() - start_time

@@ -35,7 +35,7 @@ def sample_StyleGAN_input_data(stylegan, args):
 
 
 # ---------------------- Train function ----------------------
-def train((stylegan, extractNet, criterion, device, save_dir_path, args):
+def train(stylegan, extractNet, criterion, device, save_dir_path, args):
     '''
         train
     '''
@@ -47,8 +47,12 @@ def train((stylegan, extractNet, criterion, device, save_dir_path, args):
     logger.info('-' * 10)
     logger.info(vars(args))
 
-    #globe parameter--------------------------------------------
-    secret = custom_image_nosie(batch_size, 100)
+    # globe parameter--------------------------------------------
+    num_layers = stylegan.GE.num_layers
+    get_latents_fn = mixed_list if random() < args.mixed_prob else noise_list
+    style = get_latents_fn(args.batch_size, num_layers, 100)
+    noise = custom_image_nosie(batch_size, 100)
+    secret = noise
 
     # train----------------------------------------------
     for step in range(args.num_train_steps):
@@ -56,20 +60,20 @@ def train((stylegan, extractNet, criterion, device, save_dir_path, args):
         stylegan.train()
         extractNet.train()
 
-        #clear grad-----------------------------
-        self.NET.NE.zero_grad()
-        
+        # clear grad-----------------------------
+        stylegan.NE.zero_grad()
+
         # noise-----------------------------
-        noise_styles = latent_to_nosie(self.NET.NE, self.noise)
+        noise_styles = latent_to_nosie(stylegan.NE, noise)
         # w-----------------------------
-        w_space = latent_to_w(self.NET.SE, self.style)
+        w_space = latent_to_w(stylegan.SE, style)
         w_styles = styles_def_to_tensor(w_space)
 
-        #loss-----------------------------
-        generated_images = self.NET.GE(w_styles, noise_styles)
-        decode = self.NET.E(generated_images)
-        secret_loss = self.MSELoss(decode, secret)
-        divergence = self.batch_size * (30*secret_loss)
+        # loss-----------------------------
+        generated_images = stylegan.GE(w_styles, noise_styles)
+        decode = stylegan.E(generated_images)
+        secret_loss = criterion(decode, secret)
+        divergence = args.batch_size * (30*secret_loss)
         E_loss = divergence
         E_loss.register_hook(raise_if_nan)
         E_loss.backward()

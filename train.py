@@ -43,8 +43,6 @@ def train(train_dataloader, model, device, save_dir_path, args):
 
         model.train()
 
-        logger.info('step {}/{}'.format(step + 1, args.num_train_steps))
-
         # init parameters ----------------------------------------
         total_disc_loss = torch.tensor(0.).to(device)
         total_gen_loss = torch.tensor(0.).to(device)
@@ -148,12 +146,14 @@ def train(train_dataloader, model, device, save_dir_path, args):
             model.reset_parameter_averaging()
 
         if step % 10 == 0:
+            logger.info('step {}/{}'.format(step + 1, args.num_train_steps))
             logger.info('g_loss: {:.4f}, d_loss {:.4f}'.format(g_loss, d_loss))
             logger.info('-' * 10)
 
         # Testing / Validating-----------------------------------
         if (step + 1) % args.test_every == 0 or step + 1 == args.num_train_steps:
             torch.cuda.empty_cache()
+            logger.info('step {}/{}'.format(step + 1, args.num_train_steps))
             logger.info('-------------------test--------------------')
             test(model, save_dir_path, args, num=step)
 

@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.optim import lr_scheduler
-
+import os
 from dataloader import getDataLoader
 from models import build_model
 from trainB import train
@@ -74,9 +74,18 @@ if __name__ == "__main__":
     # criterion-----------------------------------------------------------------------------------
     criterion = nn.MSELoss()
 
+    # optimizer-----------------------------------------------------------------------------------
+    for p in stylegan.parameters():
+        p.requires_grad = True
+    param_groups = [{'params': stylegan.NE.parameters(), 'lr': args.lr}]
+    optimizer = torch.optim.Adam(param_groups, lr=args.lr, betas=(0.5, 0.999))
+
+    # scheduler-----------------------------------------------------------------------------------
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=0.8, patience=8, verbose=True, threshold=0.0001)
+
     # save_dir_path-----------------------------------------------------------------------------------
     save_dir_path = os.path.join(args.save_path, args.experiment)
     os.makedirs(save_dir_path, exist_ok=True)
 
     # train -----------------------------------------------------------------------------------
-    train(stylegan, extractNet, criterion, device, save_dir_path, args)
+    train(stylegan, extractNet, criterion, optimizer, scheduler, device, save_dir_path, args)

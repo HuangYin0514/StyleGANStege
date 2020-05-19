@@ -35,7 +35,7 @@ def sample_StyleGAN_input_data(stylegan, args):
 
 
 # ---------------------- Train function ----------------------
-def train(stylegan, extractNet, criterion, device, save_dir_path, args):
+def train(stylegan, extractNet, criterion, optimizer, scheduler, device, save_dir_path, args):
     '''
         train
     '''
@@ -49,9 +49,10 @@ def train(stylegan, extractNet, criterion, device, save_dir_path, args):
 
     # globe parameter--------------------------------------------
     num_layers = stylegan.GE.num_layers
+    latent_dim = stylegan.GE.latent_dim
     get_latents_fn = mixed_list if random() < args.mixed_prob else noise_list
-    style = get_latents_fn(args.batch_size, num_layers, 100)
-    noise = custom_image_nosie(batch_size, 100)
+    style = get_latents_fn(args.batch_size, num_layers, latent_dim)
+    noise = custom_image_nosie(args.batch_size, 100)
     secret = noise
 
     # train----------------------------------------------
@@ -71,12 +72,14 @@ def train(stylegan, extractNet, criterion, device, save_dir_path, args):
 
         # loss-----------------------------
         generated_images = stylegan.GE(w_styles, noise_styles)
-        decode = stylegan.E(generated_images)
-        secret_loss = criterion(decode, secret)
-        divergence = args.batch_size * (30*secret_loss)
+        decode_msg = extractNet.E(generated_images)
+        secret_loss = criterion(decode_msg, secret)
+        divergence = args.batch_size * (1000*secret_loss)
         E_loss = divergence
         E_loss.register_hook(raise_if_nan)
         E_loss.backward()
+        optimizer.step()
+        scheduler.step(E_loss.item())
 
         # BER {1,2,3}------------------------------------------
         BER_1 = compute_BER(decode_msg.detach(), secret, sigma=1)

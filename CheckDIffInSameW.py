@@ -70,23 +70,10 @@ def genimg(model):
     # noise-------------------------------------------
     noise_ = custom_image_nosie(num_rows**2, 100)
     n = latent_to_nosie(model.N, noise_)
-    # mixing regularities--------------------------------------------
-    nn = noise(num_rows, latent_dim)
-    tmp1 = tile(nn, 0, num_rows)
-    tmp2 = nn.repeat(num_rows, 1)
-    tt = int(num_layers / 2)
-    mixed_latents = [(tmp1, tt), (tmp2, num_layers - tt)]
-    # generated_images--------------------------------------------
-    generated_images = generate_truncated(model.SE, model.GE, mixed_latents, n, av, batch_size)
-    torchvision.utils.save_image(generated_images, str(Path(save_dir_path) / f'{str(num)}-mr.{ext}'), nrow=5)
-
-    # moving averages-------------------------------------------
-    latents = noise_list(num_rows**2, num_layers, latent_dim)
-    generated_images = generate_truncated(model.SE, model.GE, latents, n, av, batch_size)
-    torchvision.utils.save_image(generated_images[0:5], str(Path(save_dir_path) / f'{str(num)}-dcgan.{ext}'), nrow=num_rows)
 
     # diff noise============================================================================================
     # mixing regularities--------------------------------------------
+    nn = noise(num_rows, latent_dim)
     nn = nn[0].repeat(num_rows, 1)
     tmp1 = tile(nn, 0, num_rows)
     tmp2 = nn.repeat(num_rows, 1)
@@ -94,23 +81,11 @@ def genimg(model):
     mixed_latents_d = [(tmp1, tt), (tmp2, num_layers - tt)]
     # generated_images--------------------------------------------
     generated_images = generate_truncated(model.SE, model.GE, mixed_latents_d, n, av, batch_size)
-    torchvision.utils.save_image(generated_images[0:5], str(Path(save_dir_path) / f'{str(num)}-dn.{ext}'), nrow=5)
+    torchvision.utils.save_image(generated_images[0:5], str(Path(save_dir_path) / f'{str(num)}-check.{ext}'), nrow=5)
 
-    # diff w============================================================================================
-    # noise-------------------------------------------
-    noise_ = custom_image_nosie(1, 100)
-    noise_ = noise_.repeat(num_rows**2, 1)
-    ndn = latent_to_nosie(model.N, noise_)
-    # mixing regularities--------------------------------------------
-    for _ in range(3):
-        nn = torch.randn(num_rows, latent_dim).to(device)
-    tmp1 = tile(nn, 0, num_rows)
-    tmp2 = nn.repeat(num_rows, 1)
-    tt = 0
-    mixed_latents = [(tmp1, tt), (tmp2, num_layers - tt)]
-    # generated_images--------------------------------------------
-    generated_images = generate_truncated(model.SE, model.GE, mixed_latents, ndn, av, batch_size)
-    torchvision.utils.save_image(generated_images[0:5], str(Path(save_dir_path) / f'{str(num)}-dw.{ext}'), nrow=5)
+    for i in range(5):
+        diff =( generated_images[i] - generated_images[0])*50
+        torchvision.utils.save_image(diff, str(Path(save_dir_path) / f'{str(num)}-check{i}.{ext}'), nrow=5)
 
 
 if __name__ == "__main__":

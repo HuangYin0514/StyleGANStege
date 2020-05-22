@@ -54,7 +54,6 @@ def generate_truncated(S, G, style, noi, av, batch_size, trunc_psi=0.6, num_imag
     generated_images = evaluate_in_chunks(batch_size, G, w_styles, noi)
     return generated_images.clamp_(0., 1.)
 
-
 def genimg(model):
     # parameters --------------------------------
     ext = 'jpg'
@@ -84,7 +83,7 @@ def genimg(model):
     torchvision.utils.save_image(generated_images[0:5], str(Path(save_dir_path) / f'{str(num)}-check.{ext}'), nrow=5)
 
     for i in range(5):
-        diff =( generated_images[i] - generated_images[0])*50
+        diff = (generated_images[i] - generated_images[0])*50
         torchvision.utils.save_image(diff, str(Path(save_dir_path) / f'{str(num)}-check{i}.{ext}'), nrow=5)
 
 

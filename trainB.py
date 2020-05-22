@@ -7,6 +7,7 @@ import torch
 import torch.backends.cudnn as cudnn
 import torch.nn as nn
 import torch.nn.functional as F
+import matplotlib.pyplot as plt
 
 from utils import checkpointNet, util_logger
 from utils.util import *
@@ -34,6 +35,21 @@ def sample_StyleGAN_input_data(stylegan, args):
     return w_styles, noise_styles, secret
 
 
+def plt_ber_curve(ber1_list, ber2_list, ber3_list):
+    plt.figure(figsize=(5, 4), dpi=80)
+    plt.subplot(1, 1, 1)
+    plt.plot(ber1_list, label='sample_acc1 ', marker='^', color='black', linewidth=1)
+    plt.plot(ber2_list, label='sample_acc2 ', marker='x', color='black', linewidth=1)
+    plt.plot(ber3_list, label='sample_acc3 ', marker='o', color='black', linewidth=1)
+    # plt.xlim((-1, 12))
+    plt.ylim((0, 0.5))
+    plt.xticks(fontsize=10.5)
+    plt.yticks(fontsize=10.5)
+    plt.legend()
+    savepath = 'experiments/BerCuver/ber_curve.jpg'
+    plt.savefig(savepath)
+
+
 # ---------------------- Train function ----------------------
 def train(stylegan, extractNet, criterion, optimizer, scheduler, device, save_dir_path, args):
     '''
@@ -55,11 +71,13 @@ def train(stylegan, extractNet, criterion, optimizer, scheduler, device, save_di
     noise = custom_image_nosie(args.batch_size, 100)
     secret = noise
 
+    BER_1_list, BER_2_list, BER_3_list = [], [], []
+
     # train----------------------------------------------
     for step in range(args.num_train_steps):
         # info ----------------------------------------------------
-        stylegan.train()
-        extractNet.train()
+        stylegan.eval()
+        extractNet.eval()
 
         # clear grad-----------------------------
         stylegan.NE.zero_grad()
@@ -74,18 +92,22 @@ def train(stylegan, extractNet, criterion, optimizer, scheduler, device, save_di
         generated_images = stylegan.GE(w_styles, noise_styles)
         decode_msg = extractNet.E(generated_images)
         secret_loss = criterion(decode_msg, secret)
-        divergence = args.batch_size * (1000*secret_loss)
+        divergence = args.batch_size * (30*secret_loss)
         E_loss = divergence
-        E_loss.register_hook(raise_if_nan)
-        E_loss.backward()
-        optimizer.step()
-        scheduler.step(E_loss.item())
+        # E_loss.backward()
+        # optimizer.step()
+        # scheduler.step(E_loss.item())
 
         # BER {1,2,3}------------------------------------------
         BER_1 = compute_BER(decode_msg.detach(), secret, sigma=1)
         BER_2 = compute_BER(decode_msg.detach(), secret, sigma=2)
         BER_3 = compute_BER(decode_msg.detach(), secret, sigma=3)
         E_loss = float(divergence.detach().item())
+
+        BER_1_list.append(BER_1)
+        BER_2_list.append(BER_2)
+        BER_3_list.append(BER_3)
+
         # logger ------------------------------------------
         if step % 10 == 0:
             logger.info('step {}/{}'.format(step + 1, args.num_train_steps))
@@ -93,6 +115,7 @@ def train(stylegan, extractNet, criterion, optimizer, scheduler, device, save_di
             logger.info('BER_1:{} BER_2:{} BER_3:{}'.format(BER_1, BER_2, BER_3))
             logger.info('-' * 10)
 
+    plt_ber_curve(BER_1_list, BER_2_list, BER_3_list)
     # stop time ---------------------------------------------------
     time_elapsed = time.time() - start_time
     logger.info('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))

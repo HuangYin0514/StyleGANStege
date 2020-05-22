@@ -66,6 +66,7 @@ def train(model, stylegan, criterion, optimizer, scheduler, device, save_dir_pat
         # update grad--------------
         E_loss.backward()
         optimizer.step()
+        scheduler.step(E_loss.item())
 
         # BER {1,2,3}------------------------------------------
         BER_1 = compute_BER(decode_msg.detach(), secret, sigma=1)

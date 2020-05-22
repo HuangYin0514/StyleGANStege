@@ -31,7 +31,7 @@ parser.add_argument('--batch_size', default=3, type=int, help='batch_size')
 """
 Model parameters
 """
-parser.add_argument('--experiment', type=str, default='ExtractNet')
+parser.add_argument('--experiment', type=str, default='ExtractNetSimilarE')
 parser.add_argument('--image_size', default=64)
 parser.add_argument('--gradient_accumulate_every', default=5)
 parser.add_argument('--mixed_prob', default=0.9)
@@ -61,7 +61,7 @@ if __name__ == "__main__":
     # torch.cuda.manual_seed_all(1)
 
     # model------------------------------------------------------------------------------------
-    model = build_model(args.experiment, image_size=args.image_size, lr=args.lr)
+    model = build_model(args.experiment, image_size=args.image_size)
     model = model.to(device)
 
     stylegan = build_model('StyleGAN2', image_size=args.image_size, lr=args.lr)
@@ -71,9 +71,18 @@ if __name__ == "__main__":
     # criterion-----------------------------------------------------------------------------------
     criterion = nn.MSELoss()
 
+    # optimizer-----------------------------------------------------------------------------------
+    for p in model.parameters():
+        p.requires_grad = True
+    param_groups = [{'params': model.parameters(), 'lr': args.lr}]
+    optimizer = torch.optim.Adam(param_groups, lr=args.lr, betas=(0.5, 0.999))
+
+    # scheduler-----------------------------------------------------------------------------------
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=0.8, patience=8, verbose=True, threshold=1e-4)
+
     # save_dir_path-----------------------------------------------------------------------------------
     save_dir_path = os.path.join(args.save_path, args.experiment)
     os.makedirs(save_dir_path, exist_ok=True)
 
     # train -----------------------------------------------------------------------------------
-    train(None, model, stylegan, criterion, device, save_dir_path, args)
+    train(model, stylegan, criterion, optimizer, scheduler, device, save_dir_path, args)

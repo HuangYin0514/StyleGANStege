@@ -35,7 +35,7 @@ def sample_StyleGAN_input_data(stylegan, args):
 
 
 # ---------------------- Train function ----------------------
-def train(train_dataloader, model, stylegan, criterion, device, save_dir_path, args):
+def train(model, stylegan, criterion, optimizer, scheduler, device, save_dir_path, args):
     '''
         train
     '''
@@ -54,18 +54,18 @@ def train(train_dataloader, model, stylegan, criterion, device, save_dir_path, a
         model.train()
 
         # clear grad-----------------
-        model.E.zero_grad()
+        model.zero_grad()
         # prepare data -------------
         w_styles, noise_styles, secret = sample_StyleGAN_input_data(stylegan, args)
         generated_images = stylegan.G(w_styles.to(device), noise_styles)
-        decode_msg = model.E(generated_images.clone().detach())
+        decode_msg = model(generated_images.clone().detach())
         # loss----------------------
         divergence = args.batch_size * criterion(decode_msg, secret)
         E_loss = divergence
         E_loss.register_hook(raise_if_nan)
         # update grad--------------
         E_loss.backward()
-        model.E_opt.step()
+        optimizer.step()
 
         # BER {1,2,3}------------------------------------------
         BER_1 = compute_BER(decode_msg.detach(), secret, sigma=1)

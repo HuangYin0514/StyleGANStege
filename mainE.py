@@ -78,7 +78,7 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(param_groups, lr=args.lr, betas=(0.5, 0.999))
 
     # scheduler-----------------------------------------------------------------------------------
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=0.8, patience=20, verbose=True, threshold=1e-8)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=0.8, patience=1000, verbose=True, threshold=1e-8)
 
     # save_dir_path-----------------------------------------------------------------------------------
     save_dir_path = os.path.join(args.save_path, args.experiment)

@@ -37,7 +37,7 @@ def sample_StyleGAN_input_data(stylegan, args):
     return w_styles, noise_styles, secret
 
 
-def plt_ber_curve(ber1_list, ber2_list, ber3_list):
+def plt_ber_curve(ber1_list, ber2_list, ber3_list, save_dir_path):
     plt.figure(figsize=(5, 4), dpi=80)
     plt.subplot(1, 1, 1)
     plt.plot(ber1_list, label='sample_acc1 ', marker='^', color='black', linewidth=1)
@@ -110,7 +110,7 @@ def train(stylegan, extractNet, criterion, optimizer, scheduler, device, save_di
             BER_1_list.append(BER_1)
             BER_2_list.append(BER_2)
             BER_3_list.append(BER_3)
-            torchvision.utils.save_image(generated_images, str(Path('experiments/BerCuver/') / f'{str(step)}.jpg'))
+            torchvision.utils.save_image(generated_images, str(Path(save_dir_path) / f'{str(step)}.jpg'))
 
         # logger ------------------------------------------
         if step % 10 == 0:
@@ -119,7 +119,7 @@ def train(stylegan, extractNet, criterion, optimizer, scheduler, device, save_di
             logger.info('BER_1:{} BER_2:{} BER_3:{}'.format(BER_1, BER_2, BER_3))
             logger.info('-' * 10)
 
-    plt_ber_curve(BER_1_list, BER_2_list, BER_3_list)
+    plt_ber_curve(BER_1_list, BER_2_list, BER_3_list, save_dir_path)
     # stop time ---------------------------------------------------
     time_elapsed = time.time() - start_time
     logger.info('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))

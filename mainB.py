@@ -26,7 +26,7 @@ Data parameters
 """
 parser.add_argument('--dataset', type=str, default='Celeba')
 parser.add_argument('--dataset_path', type=str, default='/home/hy/vscode/reid-custom/data/Market-1501-v15.09.15')
-parser.add_argument('--batch_size', default=64, type=int, help='batch_size')
+parser.add_argument('--batch_size', default=1, type=int, help='batch_size')
 
 """
 Model parameters
@@ -83,7 +83,7 @@ if __name__ == "__main__":
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=0.8, patience=8, verbose=True, threshold=1e-4)
 
     # save_dir_path-----------------------------------------------------------------------------------
-    save_dir_path = os.path.join(args.save_path, args.experiment)
+    save_dir_path = 'experiments/BerCuver'
     os.makedirs(save_dir_path, exist_ok=True)
 
     # train -----------------------------------------------------------------------------------

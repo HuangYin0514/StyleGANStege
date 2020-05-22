@@ -43,7 +43,6 @@ parser.add_argument('--checkpoint', type=str, default='/home/hy/vscode/StyleGANS
 Train parameters
 """
 parser.add_argument('--num_train_steps', type=int, default=2000)
-parser.add_argument('--test_every', type=int, default=10000)
 
 """
 Optimizer parameters
@@ -66,7 +65,7 @@ if __name__ == "__main__":
     model = model.to(device)
 
     stylegan = build_model('StyleGAN2', image_size=args.image_size, lr=args.lr)
-    stylegan = checkpointNet.load_part_network(stylegan, args.checkpoint, args.which_epoch)
+    stylegan = checkpointNet.load_part_network(stylegan, args.checkpoint, '14')
     stylegan = stylegan.to(device)
 
     # criterion-----------------------------------------------------------------------------------

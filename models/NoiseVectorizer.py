@@ -25,6 +25,6 @@ class NoiseVectorizer(nn.Module):
 
     def forward(self, x):
 
-        return torch.FloatTensor(x.size(0), 64, 64, 1).uniform_(0., 1.).to(device)
-        # return self.net(x).reshape(-1, 64, 64, 1)
+        # return torch.FloatTensor(x.size(0), 64, 64, 1).uniform_(0., 1.).to(device)
+        return self.net(x).reshape(-1, 64, 64, 1)
 

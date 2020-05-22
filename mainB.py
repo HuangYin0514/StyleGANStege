@@ -26,7 +26,7 @@ Data parameters
 """
 parser.add_argument('--dataset', type=str, default='Celeba')
 parser.add_argument('--dataset_path', type=str, default='/home/hy/vscode/reid-custom/data/Market-1501-v15.09.15')
-parser.add_argument('--batch_size', default=1, type=int, help='batch_size')
+parser.add_argument('--batch_size', default=64, type=int, help='batch_size')
 
 """
 Model parameters
@@ -63,7 +63,7 @@ if __name__ == "__main__":
 
     # model------------------------------------------------------------------------------------
     stylegan = build_model('StyleGAN2', image_size=args.image_size, lr=args.lr)
-    stylegan = checkpointNet.load_part_network(stylegan, args.checkpoint_GAN, '10')
+    stylegan = checkpointNet.load_part_network(stylegan, args.checkpoint_GAN, '14')
     stylegan = stylegan.to(device)
 
     extractNet = build_model('ExtractNet', image_size=args.image_size, lr=args.lr)
@@ -74,15 +74,13 @@ if __name__ == "__main__":
     criterion = nn.MSELoss()
 
     # optimizer-----------------------------------------------------------------------------------
-    for p in stylegan.parameters():
-        p.requires_grad = False
-    for p in extractNet.parameters():
-        p.requires_grad = False
+    for p in stylegan.NE.parameters():
+        p.requires_grad = True
     param_groups = [{'params': stylegan.NE.parameters(), 'lr': args.lr}]
     optimizer = torch.optim.Adam(param_groups, lr=args.lr, betas=(0.5, 0.999))
 
     # scheduler-----------------------------------------------------------------------------------
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=0.8, patience=8, verbose=True, threshold=0.0001)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=0.8, patience=8, verbose=True, threshold=1e-4)
 
     # save_dir_path-----------------------------------------------------------------------------------
     save_dir_path = os.path.join(args.save_path, args.experiment)

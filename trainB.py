@@ -8,6 +8,8 @@ import torch.backends.cudnn as cudnn
 import torch.nn as nn
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
+import torchvision
+from pathlib import Path
 
 from utils import checkpointNet, util_logger
 from utils.util import *
@@ -76,7 +78,7 @@ def train(stylegan, extractNet, criterion, optimizer, scheduler, device, save_di
     # train----------------------------------------------
     for step in range(args.num_train_steps):
         # info ----------------------------------------------------
-        stylegan.eval()
+        stylegan.train()
         extractNet.eval()
 
         # clear grad-----------------------------
@@ -94,9 +96,9 @@ def train(stylegan, extractNet, criterion, optimizer, scheduler, device, save_di
         secret_loss = criterion(decode_msg, secret)
         divergence = args.batch_size * (30*secret_loss)
         E_loss = divergence
-        # E_loss.backward()
-        # optimizer.step()
-        # scheduler.step(E_loss.item())
+        E_loss.backward()
+        optimizer.step()
+        scheduler.step(E_loss.item())
 
         # BER {1,2,3}------------------------------------------
         BER_1 = compute_BER(decode_msg.detach(), secret, sigma=1)
@@ -104,9 +106,11 @@ def train(stylegan, extractNet, criterion, optimizer, scheduler, device, save_di
         BER_3 = compute_BER(decode_msg.detach(), secret, sigma=3)
         E_loss = float(divergence.detach().item())
 
-        BER_1_list.append(BER_1)
-        BER_2_list.append(BER_2)
-        BER_3_list.append(BER_3)
+        if step % 10 == 0:
+            BER_1_list.append(BER_1)
+            BER_2_list.append(BER_2)
+            BER_3_list.append(BER_3)
+            torchvision.utils.save_image(generated_images, str(Path('experiments/BerCuver/') / f'{str(step)}.jpg'))
 
         # logger ------------------------------------------
         if step % 10 == 0:

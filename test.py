@@ -116,6 +116,7 @@ if __name__ == "__main__":
     # save_dir_path-----------------------------------------------------------------------------------
     save_dir_path = os.path.join(args.save_path, args.dataset)
     os.makedirs(save_dir_path, exist_ok=True)
+    print('save path is : {}'.format(save_dir_path))
 
     # model------------------------------------------------------------------------------------
     model = build_model(args.experiment, image_size=args.image_size, lr=args.lr)

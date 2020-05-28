@@ -57,8 +57,11 @@ class GeneratorBlock(nn.Module):
         # find noise --------------------------------------
         index_layer = self.layer_h_w.index(x.shape[2])
         inoise = inoise[index_layer]
-        noise1 = inoise
-        noise2 = inoise
+        noise1 = self.to_noise1(inoise).permute((0, 3, 2, 1))
+        noise2 = self.to_noise2(inoise).permute((0, 3, 2, 1))
+        # inoise = inoise[:, :x.shape[2], :x.shape[3], :]
+        # noise1 = self.to_noise1(inoise).permute((0, 3, 2, 1))
+        # noise2 = self.to_noise2(inoise).permute((0, 3, 2, 1))
 
         style1 = self.to_style1(istyle)
         x = self.conv1(x, style1)

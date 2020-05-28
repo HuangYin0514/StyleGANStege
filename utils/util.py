@@ -78,12 +78,13 @@ def leaky_relu(p):
 
 
 def evaluate_in_chunks(max_batch_size, model, *args):
-    split_args = list(
-        zip(*list(map(lambda x: x.split(max_batch_size, dim=0), args))))
-    chunked_outputs = [model(*i) for i in split_args]
-    if len(chunked_outputs) == 1:
-        return chunked_outputs[0]
-    return torch.cat(chunked_outputs, dim=0)
+    # split_args = list(
+    #     zip(*list(map(lambda x: x.split(max_batch_size, dim=0), args))))
+    # chunked_outputs = [model(*i) for i in split_args]
+    # if len(chunked_outputs) == 1:
+    #     return chunked_outputs[0]
+    # return torch.cat(chunked_outputs, dim=0)
+    return model(*args)
 
 
 def styles_def_to_tensor(styles_def):

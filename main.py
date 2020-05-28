@@ -42,7 +42,7 @@ Train parameters
 """
 parser.add_argument('--start_steps', type=int, default=25000)
 parser.add_argument('--num_train_steps', type=int, default=25002)
-parser.add_argument('--test_every', type=int, default=10000)
+parser.add_argument('--test_every', type=int, default=1)
 
 """
 Optimizer parameters

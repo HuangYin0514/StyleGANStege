@@ -48,13 +48,17 @@ class GeneratorBlock(nn.Module):
         self.activation = leaky_relu(0.2)
         self.to_rgb = RGBBlock(latent_dim, filters, upsample_rgb, rgba)
 
+        self.layer_h_w = [4, 8, 16, 32, 64]
+
     def forward(self, x, prev_rgb, istyle, inoise):
         if self.upsample is not None:
             x = self.upsample(x)
 
-        inoise = inoise[:, :x.shape[2], :x.shape[3], :]
-        noise1 = self.to_noise1(inoise).permute((0, 3, 2, 1))
-        noise2 = self.to_noise2(inoise).permute((0, 3, 2, 1))
+        # find noise --------------------------------------
+        index_layer = self.layer_h_w.index(x.shape[2])
+        inoise = inoise[index_layer]
+        noise1 = inoise
+        noise2 = inoise
 
         style1 = self.to_style1(istyle)
         x = self.conv1(x, style1)

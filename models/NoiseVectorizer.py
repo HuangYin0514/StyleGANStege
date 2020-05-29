@@ -18,6 +18,7 @@ class NoiseVectorizer(nn.Module):
             nn.Linear(emb, self.layer_h_w[layer_index]),
             nn.BatchNorm1d(self.layer_h_w[layer_index]),
             # nn.Sigmoid()
+            nn.ReLU()
         )
         # --------------------------------------------------
         layer_index = 1
@@ -25,6 +26,7 @@ class NoiseVectorizer(nn.Module):
             nn.Linear(emb, self.layer_h_w[layer_index]),
             nn.BatchNorm1d(self.layer_h_w[layer_index]),
             # nn.Sigmoid()
+            nn.ReLU()
         )
         # --------------------------------------------------
         layer_index = 2
@@ -32,6 +34,7 @@ class NoiseVectorizer(nn.Module):
             nn.Linear(emb, self.layer_h_w[layer_index]),
             nn.BatchNorm1d(self.layer_h_w[layer_index]),
             # nn.Sigmoid()
+            nn.ReLU()
         )
         # --------------------------------------------------
         layer_index = 3
@@ -39,6 +42,7 @@ class NoiseVectorizer(nn.Module):
             nn.Linear(emb, self.layer_h_w[layer_index]),
             nn.BatchNorm1d(self.layer_h_w[layer_index]),
             # nn.Sigmoid()
+            nn.ReLU()
         )
         # --------------------------------------------------
         layer_index = 4
@@ -46,6 +50,7 @@ class NoiseVectorizer(nn.Module):
             nn.Linear(emb, self.layer_h_w[layer_index]),
             nn.BatchNorm1d(self.layer_h_w[layer_index]),
             # nn.Sigmoid()
+            nn.ReLU()
         )
 
     def forward(self, x):

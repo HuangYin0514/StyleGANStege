@@ -17,35 +17,35 @@ class NoiseVectorizer(nn.Module):
         self.layer0 = nn.Sequential(
             nn.Linear(emb, self.layer_h_w[layer_index]),
             nn.BatchNorm1d(self.layer_h_w[layer_index]),
-            nn.Sigmoid()
+            # nn.Sigmoid()
         )
         # --------------------------------------------------
         layer_index = 1
         self.layer1 = nn.Sequential(
             nn.Linear(emb, self.layer_h_w[layer_index]),
             nn.BatchNorm1d(self.layer_h_w[layer_index]),
-            nn.Sigmoid()
+            # nn.Sigmoid()
         )
         # --------------------------------------------------
         layer_index = 2
         self.layer2 = nn.Sequential(
             nn.Linear(emb, self.layer_h_w[layer_index]),
             nn.BatchNorm1d(self.layer_h_w[layer_index]),
-            nn.Sigmoid()
+            # nn.Sigmoid()
         )
         # --------------------------------------------------
         layer_index = 3
         self.layer3 = nn.Sequential(
             nn.Linear(emb, self.layer_h_w[layer_index]),
             nn.BatchNorm1d(self.layer_h_w[layer_index]),
-            nn.Sigmoid()
+            # nn.Sigmoid()
         )
         # --------------------------------------------------
         layer_index = 4
         self.layer4 = nn.Sequential(
             nn.Linear(emb, self.layer_h_w[layer_index]),
             nn.BatchNorm1d(self.layer_h_w[layer_index]),
-            nn.Sigmoid()
+            # nn.Sigmoid()
         )
 
     def forward(self, x):

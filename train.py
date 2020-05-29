@@ -94,7 +94,7 @@ def train(train_dataloader, model, device, save_dir_path, args):
             # record total loss--------------------------------
             total_disc_loss += divergence.detach().item() / args.gradient_accumulate_every
         d_loss = float(total_disc_loss)
-        model.D_opt.step()
+        # model.D_opt.step()
 
         # train generator************************************
         model.G_opt.zero_grad()

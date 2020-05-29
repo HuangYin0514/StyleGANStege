@@ -65,7 +65,7 @@ if __name__ == "__main__":
     model = model.to(device)
 
     stylegan = build_model('StyleGAN2', image_size=args.image_size, lr=args.lr)
-    stylegan = checkpointNet.load_part_network(stylegan, args.checkpoint, '14')
+    stylegan = checkpointNet.load_part_network(stylegan, args.checkpoint, args.which_epoch)
     stylegan = stylegan.to(device)
 
     # criterion-----------------------------------------------------------------------------------

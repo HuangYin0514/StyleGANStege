@@ -11,6 +11,7 @@ import torch.nn.functional as F
 from utils import checkpointNet, util_logger
 from utils.util import *
 from test import test
+from utils.BER import *
 
 # speed up
 cudnn.benchmark = True
@@ -137,6 +138,54 @@ def train(train_dataloader, model, device, save_dir_path, args):
         g_loss = float(total_gen_loss)
         model.G_opt.step()
 
+        # train N************************************
+        model.N_opt.zero_grad()
+        for i in range(args.gradient_accumulate_every):
+            # w--------------------------------
+            get_latents_fn = mixed_list if random() < args.mixed_prob else noise_list
+            style = get_latents_fn(batch_size, num_layers, latent_dim)
+            w_space = latent_to_w(model.S, style)
+            w_styles = styles_def_to_tensor(w_space)
+
+            # noise--------------------------------
+            noise = custom_image_nosie(batch_size, 100)
+            noise_styles = latent_to_nosie(model.N, noise)
+
+            generated_images = model.G(w_styles, noise_styles)
+            decode_msg = model.E(generated_images)
+            # loss----------------------
+            divergence = nn.MSELoss()(decode_msg, noise)
+            E_loss = divergence
+            E_loss.backward()
+        model.N_opt.step()
+
+        # train E************************************
+        model.E_opt.zero_grad()
+        for i in range(args.gradient_accumulate_every):
+            # w--------------------------------
+            get_latents_fn = mixed_list if random() < args.mixed_prob else noise_list
+            style = get_latents_fn(batch_size, num_layers, latent_dim)
+            w_space = latent_to_w(model.S, style)
+            w_styles = styles_def_to_tensor(w_space)
+
+            # noise--------------------------------
+            noise = custom_image_nosie(batch_size, 100)
+            noise_styles = latent_to_nosie(model.N, noise)
+
+            generated_images = model.G(w_styles, noise_styles)
+            decode_msg = model.E(generated_images.clone().detach())
+            # loss----------------------
+            divergence = nn.MSELoss()(decode_msg, noise)
+            E_loss = divergence
+            E_loss.backward()
+
+        model.E_opt.step()
+
+        # BER {1,2,3}------------------------------------------
+        BER_1 = compute_BER(decode_msg.detach(), noise, sigma=1)
+        BER_2 = compute_BER(decode_msg.detach(), noise, sigma=2)
+        BER_3 = compute_BER(decode_msg.detach(), noise, sigma=3)
+
         # calculate moving averages ---------------------------------------
         if apply_path_penalty and not np.isnan(avg_pl_length):
             pl_mean = pl_length_ma.update_average(pl_mean, avg_pl_length)
@@ -148,6 +197,7 @@ def train(train_dataloader, model, device, save_dir_path, args):
         if step % 10 == 0:
             logger.info('step {}/{}'.format(step + 1, args.num_train_steps))
             logger.info('g_loss: {:.4f}, d_loss {:.4f}'.format(g_loss, d_loss))
+            logger.info('BER_1:{} BER_2:{} BER_3:{}'.format(BER_1, BER_2, BER_3))
             logger.info('-' * 10)
 
         # Testing / Validating-----------------------------------

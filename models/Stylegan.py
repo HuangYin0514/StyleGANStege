@@ -6,6 +6,7 @@ from .StyleVectorizer import *
 from .NoiseVectorizer import *
 from .Generator import *
 from .Discriminator import *
+from .ExtractNetSimilarE import ExtractNetSimilarE
 
 
 class StyleGAN2(nn.Module):
@@ -20,6 +21,8 @@ class StyleGAN2(nn.Module):
         self.N = NoiseVectorizer(noise_dim)
         self.G = Generator(image_size, latent_dim, network_capacity, transparent=transparent)
         self.D = Discriminator(image_size, network_capacity, transparent=transparent)
+        ###########################################
+        self.E = ExtractNetSimilarE(64)
 
         self.SE = StyleVectorizer(latent_dim, style_depth)
         self.NE = NoiseVectorizer(noise_dim)
@@ -30,9 +33,13 @@ class StyleGAN2(nn.Module):
         set_requires_grad(self.GE, False)
 
         generator_params = list(self.G.parameters()) + list(self.S.parameters()) + list(self.N.parameters())
-        # generator_params = list(self.N.parameters())
         self.G_opt = DiffGrad(generator_params, lr=self.lr, betas=(0.5, 0.9))
         self.D_opt = DiffGrad(self.D.parameters(), lr=self.lr, betas=(0.5, 0.9))
+        ###############################################
+        E_params = list(self.E.parameters())
+        self.E_opt = DiffGrad(E_params, lr=self.lr, betas=(0.5, 0.9))
+        N_params = list(self.N.parameters())
+        self.N_opt = DiffGrad(N_params, lr=self.lr, betas=(0.5, 0.9))
 
         self._init_weights()
         self.reset_parameter_averaging()

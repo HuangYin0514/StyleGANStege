@@ -64,4 +64,4 @@ class NoiseVectorizer(nn.Module):
 
         x4 = self.layer4(x).reshape(-1, 64, 64, 1)
 
-        return [x0, x1, x2, x3, x4]
+        return [0.5*x0, 0.5*x1, 0.5*x2, 0.5*x3, 0.5*x4]

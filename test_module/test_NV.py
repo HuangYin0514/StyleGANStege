@@ -18,6 +18,3 @@ if __name__ == "__main__":
         print(out[_].shape)
     print('complete check.')
 
-    l1 = [4,5,6,7]
-
-    print(l1.index(5))

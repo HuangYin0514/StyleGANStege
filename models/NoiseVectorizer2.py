@@ -73,4 +73,5 @@ class NoiseVectorizer(nn.Module):
         x4 = self.layer4(x).reshape(-1, self.layer_channel[4], 1, 1)
         x4 = self.layer4_pool(x4)
 
-        return [x0, x1, x2, x3, x4]
+        factor = 0.5
+        return [factor*x0, factor*x1, factor*x2, factor*x3, factor*x4]

@@ -58,7 +58,7 @@ def generate_truncated(S, G, style, noi, av, batch_size, trunc_psi=0.6, num_imag
 def genimg(model):
     # parameters --------------------------------
     ext = 'jpg'
-    num_image_tiles = 5
+    num_image_tiles = 10
     num_rows = num_image_tiles
     latent_dim = model.G.latent_dim
     image_size = model.G.image_size
@@ -70,48 +70,34 @@ def genimg(model):
     # noise-------------------------------------------
     noise_ = custom_image_nosie(num_rows**2, 100)
     n = latent_to_nosie(model.N, noise_)
-    # mixing regularities--------------------------------------------
-    nn = noise(num_rows, latent_dim)
-    tmp1 = tile(nn, 0, num_rows)
-    tmp2 = nn.repeat(num_rows, 1)
-    tt = int(num_layers / 2)
-    mixed_latents = [(tmp1, tt), (tmp2, num_layers - tt)]
-    
-    # generated_images--------------------------------------------
-    generated_images = generate_truncated(model.SE, model.GE, mixed_latents, n, av, batch_size)
-    torchvision.utils.save_image(generated_images, str(Path(save_dir_path) / f'{str(num)}-mr.{ext}'), nrow=5)
-
-    # moving averages-------------------------------------------
-    latents = noise_list(num_rows**2, num_layers, latent_dim)
-    generated_images = generate_truncated(model.SE, model.GE, latents, n, av, batch_size)
-    torchvision.utils.save_image(generated_images[0:5], str(Path(save_dir_path) / f'{str(num)}-dcgan.{ext}'), nrow=num_rows)
 
     # diff noise============================================================================================
-    # mixing regularities--------------------------------------------
-    nn = nn[0].repeat(num_rows, 1)
-    tmp1 = tile(nn, 0, num_rows)
-    tmp2 = nn.repeat(num_rows, 1)
-    tt = int(num_layers / 2)
-    mixed_latents_d = [(tmp1, tt), (tmp2, num_layers - tt)]
-    # generated_images--------------------------------------------
-    generated_images = generate_truncated(model.SE, model.GE, mixed_latents_d, n, av, batch_size)
-    torchvision.utils.save_image(generated_images[0:5], str(Path(save_dir_path) / f'{str(num)}-dn.{ext}'), nrow=5)
+    latents_W = noise(1, latent_dim)
+    latents_W = latents_W.repeat(num_rows**2, 1)
+    latents = [(latents_W, num_layers)]
+    generated_images = generate_truncated(model.SE, model.GE, latents, n, av, batch_size)
+    for index, img in enumerate(generated_images):
+        torchvision.utils.save_image(img, str(Path('experiments/sp/dn') / f'{str(num)+str(index)}-dn.{ext}'))
+    torchvision.utils.save_image(generated_images, str(Path('experiments/sp/') / f'{str(num)+str(0)}-dn-all.{ext}'))
 
     # diff w============================================================================================
-    # noise-------------------------------------------
+    latents = noise_list(num_rows**2, num_layers, latent_dim)
     noise_ = custom_image_nosie(1, 100)
     noise_ = noise_.repeat(num_rows**2, 1)
     ndn = latent_to_nosie(model.N, noise_)
-    # mixing regularities--------------------------------------------
-    for _ in range(3):
-        nn = torch.randn(num_rows, latent_dim).to(device)
-    tmp1 = tile(nn, 0, num_rows)
-    tmp2 = nn.repeat(num_rows, 1)
-    tt = 0
-    mixed_latents = [(tmp1, tt), (tmp2, num_layers - tt)]
-    # generated_images--------------------------------------------
-    generated_images = generate_truncated(model.SE, model.GE, mixed_latents, ndn, av, batch_size)
-    torchvision.utils.save_image(generated_images[0:5], str(Path(save_dir_path) / f'{str(num)}-dw.{ext}'), nrow=5)
+    generated_images = generate_truncated(model.SE, model.GE, latents, ndn, av, batch_size)
+    for index, img in enumerate(generated_images):
+        torchvision.utils.save_image(img, str(Path('experiments/sp/dw') / f'{str(num)+str(index)}-dw.{ext}'))
+    torchvision.utils.save_image(generated_images, str(Path('experiments/sp/') / f'{str(num)+str(0)}-dw-all.{ext}'))
+
+    # dcgan============================================================================================
+    latents = noise_list(num_rows**2, num_layers, latent_dim)
+    noise_ = custom_image_nosie(num_rows**2, 100)
+    n = latent_to_nosie(model.N, noise_)
+    generated_images = generate_truncated(model.SE, model.GE, latents, n, av, batch_size)
+    for index, img in enumerate(generated_images):
+        torchvision.utils.save_image(img, str(Path('experiments/sp/dcgan') / f'{str(num)+str(index)}-dcgan.{ext}'))
+    torchvision.utils.save_image(generated_images, str(Path('experiments/sp/') / f'{str(num)+str(0)}-dcgan-all.{ext}'))
 
 
 if __name__ == "__main__":
@@ -126,10 +112,5 @@ if __name__ == "__main__":
     model = build_model(experiment, image_size=64, lr=1)
     model = checkpointNet.load_part_network(model, checkpoint, which_epoch)
     model = model.to(device)
-
-    # save_dir_path-----------------------------------------------------------------------------------
-    save_path = './experiments'
-    save_dir_path = os.path.join(save_path, 'genimg')
-    os.makedirs(save_dir_path, exist_ok=True)
 
     genimg(model)

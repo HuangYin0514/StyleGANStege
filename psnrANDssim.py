@@ -9,21 +9,10 @@ def to_grey(image):
 
 
 if __name__ == "__main__":
-    # img1 = cv2.imread('experiments/sp/1.jpg')
-    # img2 = cv2.imread('experiments/sp/2.jpg')
-    # img1_grey = to_grey(img1)
-    # img2_grey = to_grey(img2)
-
-    # res_psnr = compare_psnr(img1_grey, img2_grey)
-    # print(res_psnr)
-
-    # res_ssim = compare_ssim(img1_grey, img2_grey)
-    # print(res_ssim)
-
     psnr = 0.0
     ssim = 0.0
     n = 0
-    path = 'experiments/sp/dcgan'
+    path = 'experiments/sp/dn/'
     sp_dir = os.listdir(path)
     # -------------------------------------------
     for image1 in sp_dir:

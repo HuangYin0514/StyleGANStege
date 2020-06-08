@@ -53,7 +53,7 @@ def plt_ber_curve(ber1_list, ber2_list, ber3_list, save_dir_path):
 
 
 # ---------------------- Train function ----------------------
-def train(stylegan, extractNet, criterion, optimizer, scheduler, device, save_dir_path, args):
+def train(stylegan, criterion, optimizer, scheduler, device, save_dir_path, args):
     '''
         train
     '''
@@ -78,24 +78,24 @@ def train(stylegan, extractNet, criterion, optimizer, scheduler, device, save_di
     # train----------------------------------------------
     for step in range(args.num_train_steps):
         # info ----------------------------------------------------
-        stylegan.train()
-        extractNet.eval()
-
-        # clear grad-----------------------------
-        stylegan.NE.zero_grad()
+        # stylegan.train()
 
         # noise-----------------------------
         noise_styles = latent_to_nosie(stylegan.NE, noise)
+        
         # w-----------------------------
         w_space = latent_to_w(stylegan.SE, style)
         w_styles = styles_def_to_tensor(w_space)
 
         # loss-----------------------------
         generated_images = stylegan.GE(w_styles, noise_styles)
-        decode_msg = extractNet.E(generated_images)
+        decode_msg = stylegan.E(generated_images)
         secret_loss = criterion(decode_msg, secret)
         divergence = args.batch_size * (30*secret_loss)
         E_loss = divergence
+
+        # clear grad-----------------------------
+        optimizer.zero_grad()
         E_loss.backward()
         optimizer.step()
         scheduler.step(E_loss.item())

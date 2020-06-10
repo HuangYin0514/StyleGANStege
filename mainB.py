@@ -87,4 +87,5 @@ if __name__ == "__main__":
         # train -----------------------------------------------------------------------------------
         ber = train(stylegan, criterion, optimizer, scheduler, device, save_dir_path, args)
         ber_list.append(ber)
+    print(ber_list)
     print(np.mean(ber_list))

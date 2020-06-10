@@ -10,7 +10,7 @@ from dataloader import getDataLoader
 from models import build_model
 from trainB import train
 from utils import checkpointNet
-
+import numpy as np
 
 parser = argparse.ArgumentParser(description='stegan stylegan')
 
@@ -58,29 +58,33 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Fix random seed---------------------------------------------------------------------------
-    torch.manual_seed(1)
-    torch.cuda.manual_seed_all(1)
+    # torch.manual_seed(2)
+    # torch.cuda.manual_seed_all(2)
 
-    # model------------------------------------------------------------------------------------
-    stylegan = build_model('StyleGAN2', image_size=args.image_size, lr=args.lr)
-    stylegan = checkpointNet.load_part_network(stylegan, args.checkpoint_GAN, args.which_epoch)
-    stylegan = stylegan.to(device)
+    ber_list = []
+    for i in range(2):
+        # model------------------------------------------------------------------------------------
+        stylegan = build_model('StyleGAN2', image_size=args.image_size, lr=args.lr)
+        stylegan = checkpointNet.load_part_network(stylegan, args.checkpoint_GAN, args.which_epoch)
+        stylegan = stylegan.to(device)
 
-    # criterion-----------------------------------------------------------------------------------
-    criterion = nn.MSELoss()
+        # criterion-----------------------------------------------------------------------------------
+        criterion = nn.MSELoss()
 
-    # optimizer-----------------------------------------------------------------------------------
-    for p in stylegan.NE.parameters():
-        p.requires_grad = True
-    param_groups = [{'params': stylegan.NE.parameters(), 'lr': args.lr}]
-    optimizer = torch.optim.Adam(param_groups, lr=args.lr, betas=(0.5, 0.999))
+        # optimizer-----------------------------------------------------------------------------------
+        for p in stylegan.NE.parameters():
+            p.requires_grad = True
+        param_groups = [{'params': stylegan.NE.parameters(), 'lr': args.lr}]
+        optimizer = torch.optim.Adam(param_groups, lr=args.lr, betas=(0.5, 0.999))
 
-    # scheduler-----------------------------------------------------------------------------------
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=0.8, patience=8, verbose=True, threshold=1e-4)
+        # scheduler-----------------------------------------------------------------------------------
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', factor=0.8, patience=8, verbose=True, threshold=1e-4)
 
-    # save_dir_path-----------------------------------------------------------------------------------
-    save_dir_path = 'experiments/BerCuver'
-    os.makedirs(save_dir_path, exist_ok=True)
+        # save_dir_path-----------------------------------------------------------------------------------
+        save_dir_path = 'experiments/BerCuver'
+        os.makedirs(save_dir_path, exist_ok=True)
 
-    # train -----------------------------------------------------------------------------------
-    train(stylegan, criterion, optimizer, scheduler, device, save_dir_path, args)
+        # train -----------------------------------------------------------------------------------
+        ber = train(stylegan, criterion, optimizer, scheduler, device, save_dir_path, args)
+        ber_list.append(ber)
+    print(np.mean(ber_list))

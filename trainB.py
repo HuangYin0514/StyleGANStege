@@ -116,7 +116,7 @@ def train(stylegan, criterion, optimizer, scheduler, device, save_dir_path, args
         if step % 10 == 0:
             logger.info('step {}/{}'.format(step + 1, args.num_train_steps))
             logger.info('E_loss:{}'.format(E_loss))
-            logger.info('BER_1:{} BER_2:{} BER_3:{}'.format(BER_1, BER_2, BER_3))
+            logger.info('BER_1:{:.4f} BER_2:{} BER_3:{}'.format(BER_1, BER_2, BER_3))
             logger.info('-' * 10)
 
     plt_ber_curve(BER_1_list, BER_2_list, BER_3_list, save_dir_path)
@@ -124,5 +124,6 @@ def train(stylegan, criterion, optimizer, scheduler, device, save_dir_path, args
     time_elapsed = time.time() - start_time
     logger.info('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
 
+    return BER_1
     # Save final model weights-----------------------------------
     # checkpointNet.save_network(model, save_dir_path, 'final')

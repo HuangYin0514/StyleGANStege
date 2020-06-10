@@ -101,9 +101,9 @@ def train(stylegan, criterion, optimizer, scheduler, device, save_dir_path, args
         scheduler.step(E_loss.item())
 
         # BER {1,2,3}------------------------------------------
-        BER_1 = compute_BER(decode_msg.detach(), secret, sigma=1)
-        BER_2 = compute_BER(decode_msg.detach(), secret, sigma=2)
-        BER_3 = compute_BER(decode_msg.detach(), secret, sigma=3)
+        BER_1 = compute_BER(decode_msg.detach().unsqueeze(0), secret, sigma=1)
+        BER_2 = compute_BER(decode_msg.detach().unsqueeze(0), secret, sigma=2)
+        BER_3 = compute_BER(decode_msg.detach().unsqueeze(0), secret, sigma=3)
         E_loss = float(divergence.detach().item())
 
         if step % 10 == 0:

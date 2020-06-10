@@ -26,7 +26,7 @@ Data parameters
 """
 parser.add_argument('--dataset', type=str, default='Celeba')
 parser.add_argument('--dataset_path', type=str, default='/home/hy/vscode/reid-custom/data/Market-1501-v15.09.15')
-parser.add_argument('--batch_size', default=2, type=int, help='batch_size')
+parser.add_argument('--batch_size', default=1, type=int, help='batch_size')
 
 """
 Model parameters
@@ -43,7 +43,7 @@ parser.add_argument('--checkpoint_E', type=str, default='/home/hy/vscode/StyleGA
 """
 Train parameters
 """
-parser.add_argument('--num_train_steps', type=int, default=100)
+parser.add_argument('--num_train_steps', type=int, default=50)
 
 """
 Optimizer parameters
@@ -66,10 +66,6 @@ if __name__ == "__main__":
     stylegan = checkpointNet.load_part_network(stylegan, args.checkpoint_GAN, args.which_epoch)
     stylegan = stylegan.to(device)
 
-    extractNet = build_model('ExtractNet', image_size=args.image_size, lr=args.lr)
-    extractNet = checkpointNet.load_part_network(extractNet, args.checkpoint_E, '2')
-    extractNet = extractNet.to(device)
-
     # criterion-----------------------------------------------------------------------------------
     criterion = nn.MSELoss()
 
@@ -87,4 +83,4 @@ if __name__ == "__main__":
     os.makedirs(save_dir_path, exist_ok=True)
 
     # train -----------------------------------------------------------------------------------
-    train(stylegan, extractNet, criterion, optimizer, scheduler, device, save_dir_path, args)
+    train(stylegan, criterion, optimizer, scheduler, device, save_dir_path, args)

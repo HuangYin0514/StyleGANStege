@@ -61,7 +61,7 @@ if __name__ == "__main__":
     # torch.cuda.manual_seed_all(2)
 
     ber_list = []
-    for i in range(100):
+    for i in range(1):
         # model------------------------------------------------------------------------------------
         stylegan = build_model('StyleGAN2', image_size=args.image_size, lr=args.lr)
         stylegan = checkpointNet.load_part_network(stylegan, args.checkpoint_GAN, args.which_epoch)

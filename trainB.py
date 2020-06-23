@@ -123,7 +123,9 @@ def train(stylegan, criterion, optimizer, scheduler, device, save_dir_path, args
     # stop time ---------------------------------------------------
     time_elapsed = time.time() - start_time
     logger.info('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
-
+    print(BER_1_list)
+    print(BER_2_list)
+    print(BER_3_list)
     return BER_1
     # Save final model weights-----------------------------------
     # checkpointNet.save_network(model, save_dir_path, 'final')

@@ -102,6 +102,8 @@ class Generator(nn.Module):
                 rgba=transparent
             )
             self.blocks.append(block)
+        self.upsample = nn.Upsample(scale_factor=0.5, mode='nearest')
+        self.downsample = nn.Conv2d(in_channels=3, out_channels=3, kernel_size=4, stride=2, padding=1, bias=False)
 
     def forward(self, styles, input_noise):
         batch_size = styles.shape[0]
@@ -111,5 +113,6 @@ class Generator(nn.Module):
         rgb = None
         for style, block in zip(styles, self.blocks):
             x, rgb = block(x, rgb, style, input_noise)
-
+        rgb = self.upsample(rgb)
+        # rgb = self.downsample(rgb)
         return rgb

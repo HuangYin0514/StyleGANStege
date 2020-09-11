@@ -32,7 +32,7 @@ class ExtractNetSimilarE(nn.Module):
         super().__init__()
         num_layers = int(log2(image_size) - 1)
         num_init_filters = 3 if not transparent else 4
-
+                                  
         blocks = []
         filters = [num_init_filters] + \
             [(network_capacity) * (2 ** i) for i in range(num_layers + 1)]
@@ -50,8 +50,9 @@ class ExtractNetSimilarE(nn.Module):
             blocks.append(block)
 
         self.blocks = nn.Sequential(*blocks)
-        self.to_logit = nn.Linear(2 * 2 * filters[-1], 100)
-
+        # self.to_logit = nn.Linear(2 * 2 * filters[-1], 100)
+        self.to_logit = nn.Linear(512, 100)
+        
     def forward(self, x):
         b, *_ = x.shape
         x = self.blocks(x)

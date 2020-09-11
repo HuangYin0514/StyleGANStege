@@ -76,6 +76,7 @@ def genimg(model):
     generated_images = generate_truncated(model.S, model.G, latents, n, av, batch_size)
     torchvision.utils.save_image(generated_images, str(Path(save_dir_path) / f'{str(num)}-dcgan.{ext}'), nrow=num_rows)
     for index, img in enumerate(generated_images):
+        print(img.shape)
         torchvision.utils.save_image(img, str(Path(save_dir_path) / f'{str(num)+str(index)}-dcgan.{ext}'))
 
 

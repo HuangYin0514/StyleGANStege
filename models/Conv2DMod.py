@@ -32,7 +32,7 @@ class Conv2DMod(nn.Module):
     def __init__(self, in_chan, out_chan, kernel, demod=True, stride=1, dilation=1, **kwargs):
         super().__init__()
         self.filters = out_chan
-        self.demod = demod
+        self.demod = demod 
         self.kernel = kernel
         self.stride = stride
         self.dilation = dilation

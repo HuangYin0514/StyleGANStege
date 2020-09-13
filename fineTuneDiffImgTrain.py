@@ -12,6 +12,7 @@ from utils import checkpointNet, util_logger
 from utils.util import *
 from test import test
 from utils.BER import *
+import matplotlib.pyplot as plt
 
 # speed up
 cudnn.benchmark = True
@@ -45,16 +46,12 @@ def train(train_dataloader, model, device, save_dir_path, args):
         model.train()
 
         # init parameters ----------------------------------------
-        total_disc_loss = torch.tensor(0.).to(device)
-        total_gen_loss = torch.tensor(0.).to(device)
-
         batch_size = args.batch_size
-        image_size = model.G.image_size
         latent_dim = model.G.latent_dim
         num_layers = model.G.num_layers
 
+        E_loss_list = []
 
-        
         # train E************************************
         model.E_opt.zero_grad()
         for i in range(args.gradient_accumulate_every):
@@ -73,6 +70,7 @@ def train(train_dataloader, model, device, save_dir_path, args):
             # loss----------------------
             divergence = nn.MSELoss()(decode_msg, noise)
             E_loss = divergence
+            E_loss_list.append(E_loss.clone().detach())
             E_loss.backward()
 
         model.E_opt.step()
@@ -82,10 +80,10 @@ def train(train_dataloader, model, device, save_dir_path, args):
         BER_2 = compute_BER(decode_msg.detach(), noise, sigma=2)
         BER_3 = compute_BER(decode_msg.detach(), noise, sigma=3)
 
-
+        # logging-----------------------------------------------------------------
         if step % 10 == 0:
             logger.info('step {}/{}'.format(step + 1, args.num_train_steps))
-            logger.info('g_loss: {:.4f}, d_loss {:.4f}'.format(g_loss, d_loss))
+            logger.info('e_loss: {:.4f}'.format(E_loss.clone().detach()))
             logger.info('BER_1:{} BER_2:{} BER_3:{}'.format(BER_1, BER_2, BER_3))
             logger.info('-' * 10)
 
@@ -95,6 +93,10 @@ def train(train_dataloader, model, device, save_dir_path, args):
             logger.info('step {}/{}'.format(step + 1, args.num_train_steps))
             logger.info('-------------------test--------------------')
             test(model, save_dir_path, args, num=step)
+
+        plt.figure(figsize=(5, 4), dpi=80)
+        plt.subplot(1, 1, 1)
+        plt.plot(E_loss_list, label='sample_acc1 ', marker='^', color='black', linewidth=1)
 
         # for kaggle time to stop (14400 sce about 4 hours)-----------
         if time.time() - start_time > 14400:

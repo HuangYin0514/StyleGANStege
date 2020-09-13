@@ -38,7 +38,7 @@ parser.add_argument('--checkpoint', type=str, default='/home/hy/vscode/StyleGANS
 Train parameters
 """
 parser.add_argument('--start_steps', type=int, default=25000)
-parser.add_argument('--num_train_steps', type=int, default=25002)
+parser.add_argument('--num_train_steps', type=int, default=25001)
 parser.add_argument('--test_every', type=int, default=1)
 
 """

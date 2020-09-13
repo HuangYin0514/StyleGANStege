@@ -33,12 +33,7 @@ def train(train_dataloader, model, device, save_dir_path, args):
     # logger.info(model)
 
     # init gloabel parameters ----------------------------------------
-    pl_mean = 0
-    last_gp_loss = 0
-    d_loss = 0
-    g_loss = 0
     EPS = 1e-8
-    pl_length_ma = EMA(0.99)
 
     # +++++++++++++++++++++++++++++++++start++++++++++++++++++++++++++++++++++++++++
     E_loss_list = []
@@ -53,6 +48,7 @@ def train(train_dataloader, model, device, save_dir_path, args):
 
         # train E************************************
         model.E_opt.zero_grad()
+        E_accumulate_loss = 0
         for i in range(args.gradient_accumulate_every):
             # w--------------------------------
             get_latents_fn = mixed_list if random() < args.mixed_prob else noise_list
@@ -69,10 +65,12 @@ def train(train_dataloader, model, device, save_dir_path, args):
             # loss----------------------
             divergence = nn.MSELoss()(decode_msg, noise)
             E_loss = divergence
-            E_loss_list.append(E_loss.clone().detach())
+            E_accumulate_loss += E_loss.clone().detach()
+
             E_loss.backward()
 
         model.E_opt.step()
+        E_loss_list.append(E_accumulate_loss/args.gradient_accumulate_every)
 
         # BER {1,2,3}------------------------------------------
         BER_1 = compute_BER(decode_msg.detach(), noise, sigma=1)

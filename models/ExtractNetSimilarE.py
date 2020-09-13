@@ -50,8 +50,8 @@ class ExtractNetSimilarE(nn.Module):
             blocks.append(block)
 
         self.blocks = nn.Sequential(*blocks)
-        # self.to_logit = nn.Linear(2 * 2 * filters[-1], 100)
-        self.to_logit = nn.Linear(512, 100) #32x32
+        self.to_logit = nn.Linear(2 * 2 * filters[-1], 100)
+        # self.to_logit = nn.Linear(512, 100) #32x32
         
     def forward(self, x):
         b, *_ = x.shape

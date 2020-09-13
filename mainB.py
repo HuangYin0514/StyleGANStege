@@ -12,7 +12,14 @@ from trainB import train
 from utils import checkpointNet
 import numpy as np
 
+
+"""
+train using  back progagtion for Ne network
+"""
+
+
 parser = argparse.ArgumentParser(description='stegan stylegan')
+
 
 """
 System parameters

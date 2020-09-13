@@ -15,6 +15,7 @@ if __name__ == "__main__":
     noise = custom_image_nosie(3, 100)
     inp2 = latent_to_nosie(model.N, noise)
     fake_img=model.G(inp1,inp2)
+    
     print(model.G(inp1,inp2).shape)
     print("complete check G")
 
@@ -22,6 +23,7 @@ if __name__ == "__main__":
     print("complete check D")
 
     print(model.E(fake_img).shape)
+    print(model.E(fake_img))
     print("complete check E")
 
     print('complete check.')

@@ -41,6 +41,7 @@ def train(train_dataloader, model, device, save_dir_path, args):
     pl_length_ma = EMA(0.99)
 
     # +++++++++++++++++++++++++++++++++start++++++++++++++++++++++++++++++++++++++++
+    E_loss_list = []
     for step in range(args.start_steps, args.num_train_steps):
 
         model.train()
@@ -49,8 +50,6 @@ def train(train_dataloader, model, device, save_dir_path, args):
         batch_size = args.batch_size
         latent_dim = model.G.latent_dim
         num_layers = model.G.num_layers
-
-        E_loss_list = []
 
         # train E************************************
         model.E_opt.zero_grad()
@@ -94,13 +93,15 @@ def train(train_dataloader, model, device, save_dir_path, args):
             logger.info('-------------------test--------------------')
             test(model, save_dir_path, args, num=step)
 
-        plt.figure(figsize=(5, 4), dpi=80)
-        plt.subplot(1, 1, 1)
-        plt.plot(E_loss_list, label='sample_acc1 ', marker='^', color='black', linewidth=1)
-
         # for kaggle time to stop (14400 sce about 4 hours)-----------
         if time.time() - start_time > 14400:
             break
+
+    # plot----------------------------------------------------------------
+    plt.figure(figsize=(5, 4), dpi=80)
+    plt.subplot(1, 1, 1)
+    plt.plot(E_loss_list, label='sample_acc1 ', marker='^', color='black', linewidth=1)
+    plt.savefig(f'{save_dir_path}/{step}.png')
 
     # stop time -------------------------------------------------------------
     time_elapsed = time.time() - start_time

@@ -101,7 +101,7 @@ def train(train_dataloader, model, device, save_dir_path, args):
     plt.figure(figsize=(5, 4), dpi=80)
     plt.subplot(1, 1, 1)
     plt.plot(E_loss_list, label='sample_acc1 ', marker='^', color='black', linewidth=1)
-    plt.savefig(f'{save_dir_path}/{step}.png')
+    plt.savefig(f'{save_dir_path}/plot_cuver_{step}.png')
 
     # stop time -------------------------------------------------------------
     time_elapsed = time.time() - start_time

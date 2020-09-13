@@ -7,7 +7,7 @@ from dataloader import getDataLoader, check_data
 if __name__ == "__main__":
 
     # dataset
-    loader = getDataLoader('Celeba', 64, '/home/hy/vscode/reid-custom/data/Market-1501-v15.09.15')
+    loader = getDataLoader(dataset='Celeba', batch_size=3,dataset_path= '/home/hy/vscode/StyleGANStege/data/celeba')
 
     data = next(loader)
     print(data.shape)

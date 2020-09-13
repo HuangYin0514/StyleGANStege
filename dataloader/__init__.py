@@ -43,14 +43,15 @@ def getDataLoader(dataset, batch_size, dataset_path, shuffle=True, augment=True,
             return torchvision.transforms.functional.resize(image, min_size)
         return image
 
+    img_size=32
     convert_image_fn = convert_transparent_to_rgb if not transparent else convert_rgb_to_transparent
     num_channels = 3 if not transparent else 4
     transform = transforms.Compose([
         transforms.Lambda(convert_image_fn),
-        transforms.Lambda(partial(resize_to_minimum_size, 64)),
+        transforms.Lambda(partial(resize_to_minimum_size, img_size)),
         transforms.RandomHorizontalFlip(),
-        transforms.Resize(64),
-        transforms.CenterCrop(64),
+        transforms.Resize(img_size),
+        transforms.CenterCrop(img_size),
         transforms.ToTensor(),
         transforms.Lambda(expand_greyscale(num_channels))
     ])

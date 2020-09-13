@@ -7,7 +7,7 @@ from torch.optim import lr_scheduler
 
 from dataloader import getDataLoader
 from models import build_model
-from train import *
+from fineTuneDiffImgTrain import *
 
 # -----------------------------parameters setting --------------------------------
 
@@ -30,7 +30,7 @@ parser.add_argument('--batch_size', default=3, type=int, help='batch_size')
 """
 Model parameters
 """
-parser.add_argument('--experiment', type=str, default='StyleGAN2')
+parser.add_argument('--experiment', type=str, default='FineTuneStylegan')
 parser.add_argument('--image_size', default=64)
 parser.add_argument('--gradient_accumulate_every', default=5)
 parser.add_argument('--mixed_prob', default=0.9)
@@ -69,7 +69,8 @@ if __name__ == "__main__":
     model = model.to(device)
 
     # save_dir_path-----------------------------------------------------------------------------------
-    save_dir_path = os.path.join(args.save_path, args.dataset)
+    sava_path_name = 'fineTuneDiffImg'
+    save_dir_path = os.path.join(args.save_path, sava_path_name)
     os.makedirs(save_dir_path, exist_ok=True)
 
     # train -----------------------------------------------------------------------------------

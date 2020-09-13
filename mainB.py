@@ -42,7 +42,7 @@ parser.add_argument('--checkpoint_GAN', type=str, default='/home/hy/vscode/Style
 """
 Train parameters
 """
-parser.add_argument('--num_train_steps', type=int, default=50)
+parser.add_argument('--num_train_steps', type=int, default=200)
 
 """
 Optimizer parameters

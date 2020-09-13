@@ -2,13 +2,13 @@
 import torch
 
 from .Stylegan import StyleGAN2
-from .ExtractNet import ExtractNet
 from .ExtractNetSimilarE import ExtractNetSimilarE
+from .FineTuneStylegan import FineTuneStylegan
 
 __model_factory = {
     'StyleGAN2': StyleGAN2,
-    'ExtractNet': ExtractNet,
-    'ExtractNetSimilarE':ExtractNetSimilarE
+    'ExtractNetSimilarE':ExtractNetSimilarE,
+    'FineTuneStylegan':FineTuneStylegan
 }
 
 

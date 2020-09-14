@@ -27,7 +27,7 @@ parser.add_argument('--batch_size', default=3, type=int, help='batch_size')
 """
 Model parameters
 """
-parser.add_argument('--experiment', type=str, default='StyleGAN2')
+parser.add_argument('--experiment', type=str, default='FineTuneStylegan')
 parser.add_argument('--image_size', default=64)
 parser.add_argument('--gradient_accumulate_every', default=5)
 parser.add_argument('--mixed_prob', default=0.9)

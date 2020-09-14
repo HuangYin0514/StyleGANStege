@@ -49,25 +49,25 @@ def train(train_dataloader, model, device, save_dir_path, args):
         # train E************************************
         model.E_opt.zero_grad()
         E_accumulate_loss = 0
-        for i in range(args.gradient_accumulate_every):
-            # w--------------------------------
-            get_latents_fn = mixed_list if random() < args.mixed_prob else noise_list
-            style = get_latents_fn(batch_size, num_layers, latent_dim)
-            w_space = latent_to_w(model.S, style)
-            w_styles = styles_def_to_tensor(w_space)
+        
+        # w--------------------------------
+        get_latents_fn = mixed_list if random() < args.mixed_prob else noise_list
+        style = get_latents_fn(batch_size, num_layers, latent_dim)
+        w_space = latent_to_w(model.S, style)
+        w_styles = styles_def_to_tensor(w_space)
 
-            # noise--------------------------------
-            noise = custom_image_nosie(batch_size, 100)
-            noise_styles = latent_to_nosie(model.N, noise)
+        # noise--------------------------------
+        noise = custom_image_nosie(batch_size, 100)
+        noise_styles = latent_to_nosie(model.N, noise)
 
-            generated_images = model.G(w_styles, noise_styles)
-            decode_msg = model.E(generated_images.clone().detach())
-            # loss----------------------
-            divergence = nn.MSELoss()(decode_msg, noise)
-            E_loss = divergence
-            E_accumulate_loss += E_loss.clone().detach()
+        generated_images = model.G(w_styles, noise_styles)
+        decode_msg = model.E(generated_images.clone().detach())
+        # loss----------------------
+        divergence = nn.MSELoss()(decode_msg, noise)
+        E_loss = divergence
+        E_accumulate_loss += E_loss.clone().detach()
 
-            E_loss.backward()
+        E_loss.backward()
 
         model.E_opt.step()
         E_loss_list.append(E_accumulate_loss/args.gradient_accumulate_every)

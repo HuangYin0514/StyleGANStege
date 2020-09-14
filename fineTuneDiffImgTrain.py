@@ -49,7 +49,7 @@ def train(train_dataloader, model, device, save_dir_path, args):
         # train E************************************
         model.E_opt.zero_grad()
         E_accumulate_loss = 0
-        
+
         # w--------------------------------
         get_latents_fn = mixed_list if random() < args.mixed_prob else noise_list
         style = get_latents_fn(batch_size, num_layers, latent_dim)
@@ -95,11 +95,12 @@ def train(train_dataloader, model, device, save_dir_path, args):
         if time.time() - start_time > 14400:
             break
 
-    # plot----------------------------------------------------------------
-    plt.figure(figsize=(5, 4), dpi=80)
-    plt.subplot(1, 1, 1)
-    plt.plot(E_loss_list, label='sample_acc1 ', marker='^', color='black', linewidth=1)
-    plt.savefig(f'{save_dir_path}/plot_cuver_{step}.png')
+        # plot----------------------------------------------------------------
+        if step % 500 == 0:
+            plt.figure(figsize=(5, 4), dpi=80)
+            plt.subplot(1, 1, 1)
+            plt.plot(E_loss_list, label='sample_acc1 ', marker='^', color='black', linewidth=1)
+            plt.savefig(f'{save_dir_path}/plot_cuver_{step}.png')
 
     # stop time -------------------------------------------------------------
     time_elapsed = time.time() - start_time

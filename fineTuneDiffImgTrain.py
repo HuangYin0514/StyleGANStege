@@ -64,7 +64,7 @@ def train(train_dataloader, model, device, save_dir_path, args):
         decode_msg = model.E(generated_images.clone().detach())
         # loss----------------------
         divergence = nn.MSELoss()(decode_msg, noise)
-        E_loss = divergence
+        E_loss = divergence*100
         E_accumulate_loss += E_loss.clone().detach()
 
         E_loss.backward()

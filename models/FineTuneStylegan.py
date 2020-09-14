@@ -41,12 +41,13 @@ class FineTuneStylegan(nn.Module):
         base_param_ids = set(map(id, self.E.to_logit.parameters()))
         new_params = [p for p in self.E.parameters() if id(p) not in base_param_ids]
         E_param_groups = [{'params': self.E.to_logit.parameters(), 'lr': self.lr},
-                          {'params': new_params, 'lr': self.lr}, #other E layers
+                          {'params': self.G.downsample.parameters(), 'lr': self.lr},
+                          {'params': new_params, 'lr': self.lr},  # other E layers
                           {'params': self.N.parameters(), 'lr': self.lr},
                           ]
         self.E_opt = DiffGrad(E_param_groups, lr=self.lr, betas=(0.5, 0.9))
 
-        N_params = list(self.N.parameters()) 
+        N_params = list(self.N.parameters())
         self.N_opt = DiffGrad(N_params, lr=self.lr, betas=(0.5, 0.9))
 
         self._init_weights()

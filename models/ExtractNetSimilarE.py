@@ -1,4 +1,3 @@
-import torch
 from torch import nn
 from math import log2
 from utils.util import leaky_relu
@@ -52,15 +51,14 @@ class ExtractNetSimilarE(nn.Module):
 
         self.blocks = nn.Sequential(*blocks)
         self.to_logit = nn.Linear(2 * 2 * filters[-1], 100)
-        # self.to_logit = nn.Linear(512, 100)  # 32x32
-        # self.to_logit2 = nn.Linear(100, 100)
-        self.downsample = nn.Upsample(scale_factor=2, mode='nearest')
+        self.downsample = nn.Linear(9216*3, 4096*3)
 
     def forward(self, x):
-        x=self.downsample(x)
         b, *_ = x.shape
+        x = x.reshape(b, -1)
+        x = self.downsample(x)
+        x = x.reshape(b, 3, 64, 64)
         x = self.blocks(x)
         x = x.reshape(b, -1)
         x = self.to_logit(x)
-        # x = self.to_logit2(x)
         return x.squeeze()

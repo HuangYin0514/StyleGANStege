@@ -19,8 +19,8 @@ if __name__ == "__main__":
     print(model.G(inp1,inp2).shape)
     print("complete check G")
 
-    print(model.D(fake_img))
-    print("complete check D")
+    # print(model.D(fake_img))
+    # print("complete check D")
 
     print(model.E(fake_img).shape)
     print(model.E(fake_img))

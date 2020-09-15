@@ -64,7 +64,7 @@ if __name__ == "__main__":
     model = build_model(args.experiment, image_size=args.image_size, lr=args.lr)
     model = checkpointNet.load_part_network(model, args.checkpoint, args.which_epoch)
     model = model.to(device)
-
+    
     # save_dir_path-----------------------------------------------------------------------------------
     sava_path_name = 'fineTuneDiffImg'
     save_dir_path = os.path.join(args.save_path, sava_path_name)

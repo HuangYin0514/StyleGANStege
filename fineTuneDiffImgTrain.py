@@ -72,6 +72,8 @@ def train(train_dataloader, model, device, save_dir_path, args):
         E_loss.backward()
 
         model.E_opt.step()
+        model.E_opt_scheduler.step()
+        
         E_loss_list.append(E_accumulate_loss/args.gradient_accumulate_every)
 
         # BER {1,2,3}------------------------------------------

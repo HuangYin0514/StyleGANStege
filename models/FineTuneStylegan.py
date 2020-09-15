@@ -47,7 +47,10 @@ class FineTuneStylegan(nn.Module):
         #                 #   {'params': new_params, 'lr': self.lr},  # other E layers
         #                   {'params': self.N.parameters(), 'lr': self.lr}
         #                   ]
+
         self.E_opt = DiffGrad(E_params, lr=self.lr, betas=(0.5, 0.9))
+
+        self.E_opt_scheduler = torch.optim.lr_scheduler.StepLR(self.E_opt, step_size=200, gamma=0.1)
 
         N_params = list(self.N.parameters())
         self.N_opt = DiffGrad(N_params, lr=self.lr, betas=(0.5, 0.9))

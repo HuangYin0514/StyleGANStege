@@ -54,8 +54,8 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Fix random seed---------------------------------------------------------------------------
-    torch.manual_seed(1)
-    torch.cuda.manual_seed_all(1)
+    # torch.manual_seed(1)
+    # torch.cuda.manual_seed_all(1)
 
     # dataset------------------------------------------------------------------------------------
     # train_dataloader = getDataLoader(args.dataset, args.batch_size, args.dataset_path)

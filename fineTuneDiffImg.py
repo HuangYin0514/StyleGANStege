@@ -44,7 +44,7 @@ parser.add_argument('--test_every', type=int, default=1)
 """
 Optimizer parameters
 """
-parser.add_argument('--lr', type=float, default=2e-4)
+parser.add_argument('--lr', type=float, default=2e-3)
 
 args = parser.parse_args()
 

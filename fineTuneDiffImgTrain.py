@@ -37,6 +37,7 @@ def train(train_dataloader, model, device, save_dir_path, args):
 
     # +++++++++++++++++++++++++++++++++start++++++++++++++++++++++++++++++++++++++++
     E_loss_list = []
+    ber_1_list =[]
     for step in range(args.start_steps, args.num_train_steps):
 
         model.train()
@@ -49,6 +50,7 @@ def train(train_dataloader, model, device, save_dir_path, args):
         # train E************************************
         model.E_opt.zero_grad()
         E_accumulate_loss = 0
+        
 
         # w--------------------------------
         get_latents_fn = mixed_list if random() < args.mixed_prob else noise_list
@@ -76,6 +78,7 @@ def train(train_dataloader, model, device, save_dir_path, args):
         BER_1 = compute_BER(decode_msg.detach(), noise, sigma=1)
         BER_2 = compute_BER(decode_msg.detach(), noise, sigma=2)
         BER_3 = compute_BER(decode_msg.detach(), noise, sigma=3)
+        ber_1_list.append(BER_1)
 
         # logging-----------------------------------------------------------------
         if step % 10 == 0:
@@ -99,8 +102,13 @@ def train(train_dataloader, model, device, save_dir_path, args):
         if step % 500 == 0:
             plt.figure(figsize=(5, 4), dpi=80)
             plt.subplot(1, 1, 1)
-            plt.plot(E_loss_list, label='sample_acc1 ', marker='^', color='black', linewidth=1)
+            plt.plot(E_loss_list, label='e_loss ', marker='^', color='black', linewidth=1)
             plt.savefig(f'{save_dir_path}/plot_cuver_{step}.png')
+
+            plt.figure(figsize=(5, 4), dpi=80)
+            plt.subplot(1, 1, 1)
+            plt.plot(ber_1_list, label='ber ', marker='^', color='black', linewidth=1)
+            plt.savefig(f'{save_dir_path}/plot_cuver_ber_{step}.png')
 
     # stop time -------------------------------------------------------------
     time_elapsed = time.time() - start_time

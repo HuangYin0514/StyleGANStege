@@ -55,9 +55,7 @@ class ExtractNetSimilarE(nn.Module):
 
     def forward(self, x):
         b, *_ = x.shape
-        x = x.reshape(b, -1)
         x = self.downsample(x)
-        x = x.reshape(b, 3, 64, 64)
         x = self.blocks(x)
         x = x.reshape(b, -1)
         x = self.to_logit(x)

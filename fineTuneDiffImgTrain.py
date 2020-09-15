@@ -37,7 +37,7 @@ def train(train_dataloader, model, device, save_dir_path, args):
 
     # +++++++++++++++++++++++++++++++++start++++++++++++++++++++++++++++++++++++++++
     E_loss_list = []
-    ber_1_list =[]
+    ber_1_list = []
     for step in range(args.start_steps, args.num_train_steps):
 
         model.train()
@@ -50,7 +50,6 @@ def train(train_dataloader, model, device, save_dir_path, args):
         # train E************************************
         model.E_opt.zero_grad()
         E_accumulate_loss = 0
-        
 
         # w--------------------------------
         get_latents_fn = mixed_list if random() < args.mixed_prob else noise_list
@@ -61,56 +60,56 @@ def train(train_dataloader, model, device, save_dir_path, args):
         # noise--------------------------------
         noise = custom_image_nosie(batch_size, 100)
         noise_styles = latent_to_nosie(model.N, noise)
+        for _ in range(200):
+            generated_images = model.G(w_styles, noise_styles)
+            decode_msg = model.E(generated_images.clone().detach())
+            # loss----------------------
+            divergence = nn.MSELoss()(decode_msg, noise)
+            E_loss = divergence*100
+            E_accumulate_loss += E_loss.clone().detach()
 
-        generated_images = model.G(w_styles, noise_styles)
-        decode_msg = model.E(generated_images.clone().detach())
-        # loss----------------------
-        divergence = nn.MSELoss()(decode_msg, noise)
-        E_loss = divergence*100
-        E_accumulate_loss += E_loss.clone().detach()
+            E_loss.backward()
 
-        E_loss.backward()
+            model.E_opt.step()
+            model.E_opt_scheduler.step()
 
-        model.E_opt.step()
-        model.E_opt_scheduler.step()
-        
-        E_loss_list.append(E_accumulate_loss/args.gradient_accumulate_every)
+            E_loss_list.append(E_accumulate_loss/args.gradient_accumulate_every)
 
-        # BER {1,2,3}------------------------------------------
-        BER_1 = compute_BER(decode_msg.detach(), noise, sigma=1)
-        BER_2 = compute_BER(decode_msg.detach(), noise, sigma=2)
-        BER_3 = compute_BER(decode_msg.detach(), noise, sigma=3)
-        ber_1_list.append(BER_1)
+            # BER {1,2,3}------------------------------------------
+            BER_1 = compute_BER(decode_msg.detach(), noise, sigma=1)
+            BER_2 = compute_BER(decode_msg.detach(), noise, sigma=2)
+            BER_3 = compute_BER(decode_msg.detach(), noise, sigma=3)
+            ber_1_list.append(BER_1)
 
-        # logging-----------------------------------------------------------------
-        if step % 10 == 0:
-            logger.info('step {}/{}'.format(step + 1, args.num_train_steps))
-            logger.info('e_loss: {:.4f}'.format(E_loss.clone().detach()))
-            logger.info('BER_1:{} BER_2:{} BER_3:{}'.format(BER_1, BER_2, BER_3))
-            logger.info('-' * 10)
+            # logging-----------------------------------------------------------------
+            if step % 10 == 0:
+                logger.info('step {}/{}'.format(step + 1, args.num_train_steps))
+                logger.info('e_loss: {:.4f}'.format(E_loss.clone().detach()))
+                logger.info('BER_1:{} BER_2:{} BER_3:{}'.format(BER_1, BER_2, BER_3))
+                logger.info('-' * 10)
 
-        # Testing / Validating-----------------------------------
-        if (step + 1) % args.test_every == 0 or step + 1 == args.num_train_steps:
-            torch.cuda.empty_cache()
-            logger.info('step {}/{}'.format(step + 1, args.num_train_steps))
-            logger.info('-------------------test--------------------')
-            test(model, save_dir_path, args, num=step)
+            # Testing / Validating-----------------------------------
+            if (step + 1) % args.test_every == 0 or step + 1 == args.num_train_steps:
+                torch.cuda.empty_cache()
+                logger.info('step {}/{}'.format(step + 1, args.num_train_steps))
+                logger.info('-------------------test--------------------')
+                test(model, save_dir_path, args, num=step)
 
-        # for kaggle time to stop (14400 sce about 4 hours)-----------
-        if time.time() - start_time > 14400:
-            break
+            # for kaggle time to stop (14400 sce about 4 hours)-----------
+            if time.time() - start_time > 14400:
+                break
 
-        # plot----------------------------------------------------------------
-        if step % 500 == 0:
-            plt.figure(figsize=(5, 4), dpi=80)
-            plt.subplot(1, 1, 1)
-            plt.plot(E_loss_list, label='e_loss ', marker='^', color='black', linewidth=1)
-            plt.savefig(f'{save_dir_path}/plot_cuver_{step}.png')
+            # plot----------------------------------------------------------------
+            if step % 500 == 0:
+                plt.figure(figsize=(5, 4), dpi=80)
+                plt.subplot(1, 1, 1)
+                plt.plot(E_loss_list, label='e_loss ', marker='^', color='black', linewidth=1)
+                plt.savefig(f'{save_dir_path}/plot_cuver_{step}.png')
 
-            plt.figure(figsize=(5, 4), dpi=80)
-            plt.subplot(1, 1, 1)
-            plt.plot(ber_1_list, label='ber ', marker='^', color='black', linewidth=1)
-            plt.savefig(f'{save_dir_path}/plot_cuver_ber_{step}.png')
+                plt.figure(figsize=(5, 4), dpi=80)
+                plt.subplot(1, 1, 1)
+                plt.plot(ber_1_list, label='ber ', marker='^', color='black', linewidth=1)
+                plt.savefig(f'{save_dir_path}/plot_cuver_ber_{step}.png')
 
     # stop time -------------------------------------------------------------
     time_elapsed = time.time() - start_time

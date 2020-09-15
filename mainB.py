@@ -38,7 +38,7 @@ parser.add_argument('--batch_size', default=1, type=int, help='batch_size')
 """
 Model parameters
 """
-parser.add_argument('--experiment', type=str, default='ExtractNet')
+parser.add_argument('--experiment', type=str, default='FineTuneStylegan')
 parser.add_argument('--image_size', default=64)
 parser.add_argument('--gradient_accumulate_every', default=5)
 parser.add_argument('--mixed_prob', default=0.9)
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     ber_list = []
     for i in range(1):
         # model------------------------------------------------------------------------------------
-        stylegan = build_model('StyleGAN2', image_size=args.image_size, lr=args.lr)
+        stylegan = build_model(args.experiment, image_size=args.image_size, lr=args.lr)
         stylegan = checkpointNet.load_part_network(stylegan, args.checkpoint_GAN, args.which_epoch)
         stylegan = stylegan.to(device)
 

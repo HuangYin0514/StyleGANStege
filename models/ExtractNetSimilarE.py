@@ -51,7 +51,7 @@ class ExtractNetSimilarE(nn.Module):
 
         self.blocks = nn.Sequential(*blocks)
         self.to_logit = nn.Linear(2 * 2 * filters[-1], 100)
-        self.downsample = nn.Linear(9216*3, 4096*3)
+        self.downsample = nn.AdaptiveMaxPool2d((64,64))
 
     def forward(self, x):
         b, *_ = x.shape

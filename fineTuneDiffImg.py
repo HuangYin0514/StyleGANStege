@@ -58,7 +58,7 @@ if __name__ == "__main__":
     torch.cuda.manual_seed_all(1)
 
     # dataset------------------------------------------------------------------------------------
-    train_dataloader = getDataLoader(args.dataset, args.batch_size, args.dataset_path)
+    # train_dataloader = getDataLoader(args.dataset, args.batch_size, args.dataset_path)
 
     # model------------------------------------------------------------------------------------
     model = build_model(args.experiment, image_size=args.image_size, lr=args.lr)
@@ -71,4 +71,5 @@ if __name__ == "__main__":
     os.makedirs(save_dir_path, exist_ok=True)
 
     # train -----------------------------------------------------------------------------------
+    train_dataloader=None
     train(train_dataloader, model, device, save_dir_path, args)

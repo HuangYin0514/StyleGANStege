@@ -51,14 +51,16 @@ class ExtractNetSimilarE(nn.Module):
             blocks.append(block)
 
         self.blocks = nn.Sequential(*blocks)
-        # self.to_logit = nn.Linear(2 * 2 * filters[-1], 100)
-        self.to_logit = nn.Linear(512, 100)  # 32x32
-        self.to_logit2 = nn.Linear(100, 100)
+        self.to_logit = nn.Linear(2 * 2 * filters[-1], 100)
+        # self.to_logit = nn.Linear(512, 100)  # 32x32
+        # self.to_logit2 = nn.Linear(100, 100)
+        self.downsample = nn.Upsample(scale_factor=2, mode='nearest')
 
     def forward(self, x):
+        x=self.downsample(x)
         b, *_ = x.shape
         x = self.blocks(x)
         x = x.reshape(b, -1)
         x = self.to_logit(x)
-        x = self.to_logit2(x)
+        # x = self.to_logit2(x)
         return x.squeeze()

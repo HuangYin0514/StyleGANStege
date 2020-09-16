@@ -102,7 +102,7 @@ class Generator(nn.Module):
                 rgba=transparent
             )
             self.blocks.append(block)
-        self.downsample = nn.AdaptiveAvgPool2d((128,128)) # 32x32
+        self.downsample = nn.AdaptiveAvgPool2d((32,32)) # 32x32
         # self.downsample = nn.Conv2d(in_channels=3, out_channels=3, kernel_size=4, stride=2, padding=1, bias=False)
         
 

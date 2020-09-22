@@ -72,8 +72,9 @@ def genimg(model):
     n = latent_to_nosie(model.N, noise_)
 
     # moving averages-------------------------------------------
-    latents = noise_list(num_rows**2, num_layers, latent_dim)
-    generated_images = generate_truncated(model.S, model.G, latents, n, av, batch_size)
+    # latents = noise_list(num_rows**2, num_layers, latent_dim)
+    latents = [(noise(num_rows**2, latent_dim), num_layers)]
+    generated_images = generate_truncated(model.SE, model.GE, latents, n, av, batch_size)
     torchvision.utils.save_image(generated_images, str(Path(save_dir_path) / f'{str(num)}-dcgan.{ext}'), nrow=num_rows)
     for index, img in enumerate(generated_images):
         print(img.shape)

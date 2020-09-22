@@ -9,7 +9,6 @@ class NoiseVectorizer(nn.Module):
     def __init__(self, emb):
         super().__init__()
 
-        # self.layer_channel = [512, 256, 128, 64, 32]
         self.layer_h_w = [4**2, 8**2, 16**2, 32**2, 64**2]
 
         # --------------------------------------------------

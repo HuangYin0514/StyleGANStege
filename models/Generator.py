@@ -114,5 +114,5 @@ class Generator(nn.Module):
         rgb = None
         for style, block in zip(styles, self.blocks):
             x, rgb = block(x, rgb, style, input_noise)
-        rgb = self.downsample(rgb) # 32x32
+        # rgb = self.downsample(rgb) # 32x32
         return rgb
